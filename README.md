@@ -1,2 +1,2 @@
 A small project to create artificial cell life
-[Here](CellLife.html)
+[Here](https://georgi57.github.io/CellLife/CellLife.html)
