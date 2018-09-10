@@ -8,6 +8,8 @@ Started 2018-09-08
 		<title>Home</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" href="../css/topnav.css">
+		<link rel="stylesheet" href="css/celllife.css">
+		<script src="js/celllife.js"></script>
 	</head>
 
 	<body>
@@ -17,11 +19,17 @@ Started 2018-09-08
 			  <a class="active" href="">CellLife</a>
 		</div>
 		
-		<h1>CellLife project</h1>
-		<h2>The idea here is to simulate cell life</h2>
+		<h1>
+			<button id="button" class="startbutton" onclick="button_click()">
+				<span id="buttontext">Start </span>
+			</button> 
+		cell life simulation
+		</h1>
 		
-		<canvas id="myCanvas" width="400" height="400" style="border:2px solid #000000;">
-		</canvas>
+		<div class="content">
+			<canvas id="myCanvas" width="500" height="500" style="border:2px solid #000000;">
+			</canvas>
+		</div>
 
 	</body>
 </html>
