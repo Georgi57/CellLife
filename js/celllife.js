@@ -33,7 +33,7 @@ function button_click()
 		// Create new world
 		create_new_world();
 		create_life();
-		leave_life_alone();
+		live();
 	}
 }
 
@@ -55,7 +55,7 @@ function create_new_world()
 function create_life()
 {
 	var i;
-	for (i = 0; i < 10; i++) {
+	for (i = 0; i < 50; i++) {
 		
 		// Cell parameters
 		var new_cell = {
@@ -73,38 +73,54 @@ function create_life()
 
 function cells_move_randomly()
 {
-
+	for (i = 0; i < cells.length; i++)
+	{
+		var direction = Math.floor((Math.random() * 4));
+		switch(direction){
+			case 0:
+				cells[i].y += 1;
+				if (cells[i].y >= world_height) cells[i].y -= world_height;
+				break;
+			case 1:
+				cells[i].x += 1;
+				if (cells[i].x >= world_width) cells[i].x -= world_width;
+				break;
+			case 2:
+				cells[i].y -= 1;
+				if (cells[i].y <= 0) cells[i].y += world_height;
+				break;
+			case 3:
+				cells[i].x -= 1;
+				if (cells[i].x <= 0) cells[i].x += world_width;
+				break;
+		}
+	}
 }
 
 function live()
 {
+	var i;
+	var world_location;
+	
 	// Make cells do something
+	// -----------------------
 	
 	cells_move_randomly();
 	
+	// -----------------------
 	
 	// Display current state
-	world_view.putImageData(world,0,0);
 	
-	if (celllife_running)
-	{
-		setTimeout(live, 500);
-	}
-}
-
-function leave_life_alone()
-{
-	document.getElementById("buttontext").innerHTML = "Stop";
-	
-	// Display current state
-	var i;
-	var world_location;
 	for (i = 0; i < cells.length; i++) {
 		world_location = (cells[i].y*world_width + cells[i].x)*4;
 		world.data[world_location+0]=0;
 		world.data[world_location+1]=0;
 		world.data[world_location+2]=0;
 	}
+	world_view.putImageData(world,0,0);
 	
-	live()
+	if (celllife_running)
+	{
+		setTimeout(live, 100);
+	}
 }
