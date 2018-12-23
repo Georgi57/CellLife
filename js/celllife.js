@@ -71,8 +71,31 @@ function create_life()
 	}
 }
 
+function cells_move_randomly()
+{
+
+}
+
+function live()
+{
+	// Make cells do something
+	
+	cells_move_randomly();
+	
+	
+	// Display current state
+	world_view.putImageData(world,0,0);
+	
+	if (celllife_running)
+	{
+		setTimeout(live, 500);
+	}
+}
+
 function leave_life_alone()
 {
+	document.getElementById("buttontext").innerHTML = "Stop";
+	
 	// Display current state
 	var i;
 	var world_location;
@@ -83,8 +106,5 @@ function leave_life_alone()
 		world.data[world_location+2]=0;
 	}
 	
-	// Make cells do something TODO
-	
-	world_view.putImageData(world,0,0);
-	document.getElementById("buttontext").innerHTML = "Finished";
+	live()
 }
