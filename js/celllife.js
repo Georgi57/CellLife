@@ -117,23 +117,42 @@ function cells_move_randomly()
 				
 				var type = Math.floor((Math.random() * 100));
 				if (type==0) new_cell.type = 'r';
+				if (type==1) new_cell.type = 'y';
 				
 				cell_total_number += 1;
 				cells.push(new_cell);
 			}
 		}
 		
-		// Chance for red cell to eat another cell
+		// Chance for red cell to eat another cell and reproduce
 		if (cells[i].type == 'r')
 		{
 			var n;
 			for (n = 0; n < cells.length; n++)
 			{
-				if (cells[i].x == cells[n].x && cells[i].y == cells[n].y && i!==n)
+				if (cells[i].x == cells[n].x && cells[i].y == cells[n].y && i!==n && cells[i].type!=='d' && i!==n)
 				{
-					var type = Math.floor((Math.random() * 2));
+					var type = Math.floor((Math.random() * 10));
 					if (type==0) cells[n].type = 'r';
-					cells_to_delete.push(n);
+					else if (type==1) cells[n].type = 'y';
+					else cells_to_delete.push(n);
+					break;
+				}
+			}
+		}
+		
+		// Yellow
+		if (cells[i].type == 'y')
+		{
+			var n;
+			for (n = 0; n < cells.length; n++)
+			{
+				if (cells[i].x == cells[n].x && cells[i].y == cells[n].y && i!==n && cells[i].type=='d')
+				{
+					var type = Math.floor((Math.random() * 10));
+					if (type==0) cells[n].type = 'y';
+					else if (type==1) cells[n].type = 'g';
+					else cells_to_delete.push(n);
 					break;
 				}
 			}
@@ -180,6 +199,12 @@ function live()
 		{
 			world.data[world_location+0]=0;
 			world.data[world_location+1]=0;
+			world.data[world_location+2]=0;
+		}
+		else if (cells[i].type=='y')
+		{
+			world.data[world_location+0]=200;
+			world.data[world_location+1]=200;
 			world.data[world_location+2]=0;
 		}
 		else
