@@ -115,7 +115,6 @@ function live()
 	// -----------------------
 	
 	// Display current state
-	
 	for (i = 0; i < cells.length; i++) {
 		world_location = (cells[i].y*world_width + cells[i].x)*4;
 		
@@ -132,6 +131,20 @@ function live()
 		
 		world.data[world_location+2]=0;
 	}
+	
+	// Fade the traces of cells
+	for (i = 0; i < world_height*world_width*4; i+=4)
+	{
+		if (world.data[i]>50) world.data[i]--;
+		else if (world.data[i]<50) world.data[i]++;
+
+		if (world.data[i+1]>50) world.data[i+1]--;
+		else if (world.data[i+1]<50) world.data[i+1]++;
+		
+		if (world.data[i+2]>255) world.data[i+2]--;
+		else if (world.data[i+2]<255) world.data[i+2]++;
+	}
+	
 	world_view.putImageData(world,0,0);
 	
 	if (celllife_running)
