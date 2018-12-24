@@ -69,9 +69,6 @@ function create_life()
 		new_cell.x = Math.floor((Math.random() * world_width));
 		new_cell.y = Math.floor((Math.random() * world_height));
 		
-		var type = Math.floor((Math.random() * 10));
-		if (type==0) new_cell.type = 'r';
-		
 		cells.push(new_cell);
 	}
 }
@@ -80,26 +77,29 @@ function cells_move_randomly()
 {
 	for (i = 0; i < cells.length; i++)
 	{
-		var direction = Math.floor((Math.random() * 4));
-		switch(direction){
-			case 0:
-				cells[i].y += 1;
-				if (cells[i].y >= world_height) cells[i].y -= world_height;
-				break;
-			case 1:
-				cells[i].x += 1;
-				if (cells[i].x >= world_width) cells[i].x -= world_width;
-				break;
-			case 2:
-				cells[i].y -= 1;
-				if (cells[i].y <= 0) cells[i].y += world_height;
-				break;
-			case 3:
-				cells[i].x -= 1;
-				if (cells[i].x <= 0) cells[i].x += world_width;
-				break;
+		if (cells[i].type !== 'd'){
+			var direction = Math.floor((Math.random() * 4));
+			switch(direction){
+				case 0:
+					cells[i].y += 1;
+					if (cells[i].y >= world_height) cells[i].y -= world_height;
+					break;
+				case 1:
+					cells[i].x += 1;
+					if (cells[i].x >= world_width) cells[i].x -= world_width;
+					break;
+				case 2:
+					cells[i].y -= 1;
+					if (cells[i].y <= 0) cells[i].y += world_height;
+					break;
+				case 3:
+					cells[i].x -= 1;
+					if (cells[i].x <= 0) cells[i].x += world_width;
+					break;
+			}
 		}
 		
+		// Chance for green cells to reproduce
 		if (cells[i].type == 'g')
 		{
 			var reproduction_chance = Math.floor((Math.random() * 200));
@@ -113,9 +113,19 @@ function cells_move_randomly()
 					type: 'g'
 				};
 				
+				var type = Math.floor((Math.random() * 1000));
+				if (type==0) new_cell.type = 'r';
+				
 				cell_total_number += 1;
 				cells.push(new_cell);
 			}
+		}
+		
+		// Chance for any cell to die
+		var reproduction_chance = Math.floor((Math.random() * 250));
+		if (reproduction_chance == 0)
+		{
+			cells[i].type = 'd';
 		}
 	}
 }
@@ -140,11 +150,19 @@ function live()
 		{
 			world.data[world_location+0]=150;
 			world.data[world_location+1]=0;
+			world.data[world_location+2]=0;
+		}
+		if (cells[i].type=='d')
+		{
+			world.data[world_location+0]=0;
+			world.data[world_location+1]=0;
+			world.data[world_location+2]=0;
 		}
 		else
 		{
 			world.data[world_location+0]=0;
 			world.data[world_location+1]=150;
+			world.data[world_location+2]=0;
 		}
 		
 		world.data[world_location+2]=0;
@@ -167,6 +185,6 @@ function live()
 	
 	if (celllife_running)
 	{
-		setTimeout(live, 100);
+		setTimeout(live, 10);
 	}
 }
