@@ -13,6 +13,8 @@ var world_view;
 var cells = [];
 var cell_total_number = 0;
 
+var cells_to_delete = [];
+
 function button_click()
 {
 	if (celllife_running)
@@ -55,7 +57,7 @@ function create_new_world()
 function create_life()
 {
 	var i;
-	for (i = 0; i < 10; i++) {
+	for (i = 0; i < 100; i++) {
 		
 		// Cell parameters
 		var new_cell = {
@@ -113,7 +115,7 @@ function cells_move_randomly()
 					type: 'g'
 				};
 				
-				var type = Math.floor((Math.random() * 1000));
+				var type = Math.floor((Math.random() * 100));
 				if (type==0) new_cell.type = 'r';
 				
 				cell_total_number += 1;
@@ -121,9 +123,25 @@ function cells_move_randomly()
 			}
 		}
 		
+		// Chance for red cell to eat another cell
+		if (cells[i].type == 'r')
+		{
+			var n;
+			for (n = 0; n < cells.length; n++)
+			{
+				if (cells[i].x == cells[n].x && cells[i].y == cells[n].y && i!==n)
+				{
+					var type = Math.floor((Math.random() * 2));
+					if (type==0) cells[n].type = 'r';
+					cells_to_delete.push(n);
+					break;
+				}
+			}
+		}
+		
 		// Chance for any cell to die
-		var reproduction_chance = Math.floor((Math.random() * 250));
-		if (reproduction_chance == 0)
+		var death_chance = Math.floor((Math.random() * 250));
+		if (death_chance == 0)
 		{
 			cells[i].type = 'd';
 		}
@@ -142,6 +160,12 @@ function live()
 	
 	// -----------------------
 	
+	// Remove empty cells
+	for (i = 0; i < cells_to_delete.length; i++)
+	{
+		cells.splice(cells_to_delete.pop(),1);
+	}
+	
 	// Display current state
 	for (i = 0; i < cells.length; i++) {
 		world_location = (cells[i].y*world_width + cells[i].x)*4;
@@ -152,7 +176,7 @@ function live()
 			world.data[world_location+1]=0;
 			world.data[world_location+2]=0;
 		}
-		if (cells[i].type=='d')
+		else if (cells[i].type=='d')
 		{
 			world.data[world_location+0]=0;
 			world.data[world_location+1]=0;
