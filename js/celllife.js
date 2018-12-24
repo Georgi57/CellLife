@@ -55,7 +55,7 @@ function create_new_world()
 function create_life()
 {
 	var i;
-	for (i = 0; i < 200; i++) {
+	for (i = 0; i < 10; i++) {
 		
 		// Cell parameters
 		var new_cell = {
@@ -98,6 +98,24 @@ function cells_move_randomly()
 				cells[i].x -= 1;
 				if (cells[i].x <= 0) cells[i].x += world_width;
 				break;
+		}
+		
+		if (cells[i].type == 'g')
+		{
+			var reproduction_chance = Math.floor((Math.random() * 200));
+			if (reproduction_chance == 0)
+			{
+				// Cell parameters
+				var new_cell = {
+					number: cell_total_number, 	// Cell number
+					x: cells[i].x,		// location x
+					y: cells[i].y,		// location y
+					type: 'g'
+				};
+				
+				cell_total_number += 1;
+				cells.push(new_cell);
+			}
 		}
 	}
 }
