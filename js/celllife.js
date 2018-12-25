@@ -11,6 +11,7 @@ var world_width = 500;
 var world;
 var world_view;
 var cells = [];
+var cells_counts = new Array(4);
 var cell_total_number = 0;
 
 var cells_to_delete = [];
@@ -77,6 +78,11 @@ function create_life()
 
 function cells_move_randomly()
 {
+	cells_counts[0]=0;
+	cells_counts[1]=0;
+	cells_counts[2]=0;
+	cells_counts[3]=0;
+	
 	for (i = 0; i < cells.length; i++)
 	{
 		if (cells[i].type !== 'd'){
@@ -100,6 +106,11 @@ function cells_move_randomly()
 					break;
 			}
 		}
+		// Cell count
+		if (cells[i].type == 'g') cells_counts[0]++;
+		else if (cells[i].type == 'r') cells_counts[1]++;
+		else if (cells[i].type == 'y') cells_counts[2]++;
+		else cells_counts[3]++;
 		
 		// Chance for green cells to reproduce
 		if (cells[i].type == 'g')
@@ -147,7 +158,7 @@ function cells_move_randomly()
 			var n;
 			for (n = 0; n < cells.length; n++)
 			{
-				if (cells[i].x == cells[n].x && cells[i].y == cells[n].y && i!==n && cells[i].type=='d')
+				if (cells[i].x == cells[n].x && cells[i].y == cells[n].y && i!==n && cells[n].type=='d')
 				{
 					var type = Math.floor((Math.random() * 10));
 					if (type==0) cells[n].type = 'y';
@@ -171,13 +182,6 @@ function live()
 {
 	var i;
 	var world_location;
-	
-	// Make cells do something
-	// -----------------------
-	
-	cells_move_randomly();
-	
-	// -----------------------
 	
 	// Remove empty cells
 	for (i = 0; i < cells_to_delete.length; i++)
@@ -217,6 +221,13 @@ function live()
 		world.data[world_location+2]=0;
 	}
 	
+	// Make cells do something
+	// -----------------------
+	
+	cells_act();
+	
+	// -----------------------
+	
 	// Fade the traces of cells
 	for (i = 0; i < world_height*world_width*4; i+=4)
 	{
@@ -230,6 +241,7 @@ function live()
 		else if (world.data[i+2]<255) world.data[i+2]++;
 	}
 	
+	console.log(cells.length, cells_counts);
 	world_view.putImageData(world,0,0);
 	
 	if (celllife_running)
