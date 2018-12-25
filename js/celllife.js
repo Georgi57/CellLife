@@ -76,7 +76,42 @@ function create_life()
 	}
 }
 
-function cells_move_randomly()
+function search_around(x, y, depth){
+	var result = new Array(3);
+	result[0]=x;
+	result[1]=y;
+	result[2]=0;
+	
+	// +X
+	if (world.data[(x+1 + world_height*y)*4]==0 &&
+		world.data[(x+1 + world_height*y)*4+1]==0 &&
+		world.data[(x+1 + world_height*y)*4+2]==0){
+		result[0]=x-1;
+		result[1]=y;
+		result[2]=1;
+		return result;
+	}
+	else if (depth>0){
+		result = search_around(x+1, y, depth-1);
+	}
+	if (result[2]==1) return result;
+	
+	// -X
+	if (world.data[(x-1 + world_height*y)*4]==0 &&
+		world.data[(x-1 + world_height*y)*4+1]==0 &&
+		world.data[(x-1 + world_height*y)*4+2]==0){
+		result[0]=x+1;
+		result[1]=y;
+		result[2]=1;
+		return result;
+	}
+	else if (depth>0){
+		result = search_around(x-1, y, depth-1);
+	}
+	return result;
+}
+
+function cells_act()
 {
 	cells_counts[0]=0;
 	cells_counts[1]=0;
@@ -85,27 +120,6 @@ function cells_move_randomly()
 	
 	for (i = 0; i < cells.length; i++)
 	{
-		if (cells[i].type !== 'd'){
-			var direction = Math.floor((Math.random() * 4));
-			switch(direction){
-				case 0:
-					cells[i].y += 1;
-					if (cells[i].y >= world_height) cells[i].y -= world_height;
-					break;
-				case 1:
-					cells[i].x += 1;
-					if (cells[i].x >= world_width) cells[i].x -= world_width;
-					break;
-				case 2:
-					cells[i].y -= 1;
-					if (cells[i].y <= 0) cells[i].y += world_height;
-					break;
-				case 3:
-					cells[i].x -= 1;
-					if (cells[i].x <= 0) cells[i].x += world_width;
-					break;
-			}
-		}
 		// Cell count
 		if (cells[i].type == 'g') cells_counts[0]++;
 		else if (cells[i].type == 'r') cells_counts[1]++;
@@ -174,6 +188,50 @@ function cells_move_randomly()
 		if (death_chance == 0)
 		{
 			cells[i].type = 'd';
+		}
+		
+		if (cells[i].type !== 'd'){
+			var move_randomly = 1;
+			
+			// Yellow search dead cells
+			if (cells[i].type == 'y'){
+				var target = search_around(cells[i].x, cells[i].y, 10);
+				
+				if (target[2]==1){
+					if (target[0]>cells[i].x){
+						cells[i].x += 1;
+						if (cells[i].x >= world_width) cells[i].x -= world_width;
+						move_randomly = 0;
+					}
+					else if (target[0]<cells[i].x){
+						cells[i].x -= 1;
+						if (cells[i].x <= 0) cells[i].x += world_width;
+						move_randomly = 0;
+					}
+				}
+			}
+			
+			if (move_randomly){
+				var direction = Math.floor((Math.random() * 4));
+				switch(direction){
+					case 0:
+						cells[i].y += 1;
+						if (cells[i].y >= world_height) cells[i].y -= world_height;
+						break;
+					case 1:
+						cells[i].x += 1;
+						if (cells[i].x >= world_width) cells[i].x -= world_width;
+						break;
+					case 2:
+						cells[i].y -= 1;
+						if (cells[i].y <= 0) cells[i].y += world_height;
+						break;
+					case 3:
+						cells[i].x -= 1;
+						if (cells[i].x <= 0) cells[i].x += world_width;
+						break;
+				}
+			}
 		}
 	}
 }
