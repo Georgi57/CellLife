@@ -16,6 +16,8 @@ var cell_total_number = 0;
 
 var cells_to_delete = [];
 
+function cells_act();
+
 function button_click()
 {
 	if (celllife_running)
