@@ -1,3 +1,7 @@
+/*
+Written by Georgi Olentsenko for CellLife project
+Started 2020-07-29
+*/
 
 function cells_act()
 {
