@@ -53,8 +53,13 @@ Started 2018-09-08
   right: 0;
 }
 
-/* Add a color to the active/current link */
-#status {
-    background-color: #00ff00;
-    color: black;
+.loader {
+  border: 5px solid #347FE0;          /*Blue, world color*/
+  border-bottom: 5px solid #00ff00;      /*Green, plant color*/
+  border-right: 5px solid #ffff00;    /*Yellow, herbivore color*/
+  border-top: 5px solid #ff0000;   /*Red, carnivore color*/
+  border-radius: 50%;
+  width: 9px;
+  height: 9px;
+  animation: spin 2s linear infinite;
 }
