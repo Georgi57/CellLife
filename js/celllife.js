@@ -5,6 +5,15 @@ Started 2018-09-08
 
 var celllife_running = false;
 
+// Window properties
+var window_width = window.innerWidth
+	|| document.documentElement.clientWidth
+	|| document.body.clientWidth;
+
+var window_height = window.innerHeight
+	|| document.documentElement.clientHeight
+	|| document.body.clientHeight;
+
 // World parameters
 var world_height = 500;
 var world_width = 500;
@@ -17,6 +26,22 @@ var cell_total_number = 0;
 var cells_to_delete = [];
 
 cells_act();
+
+function load_function()
+{
+	console.log("Space for canvas:",window_width, window_height);
+	// Resize the canvas if needed
+	var world_canvas = document.getElementById("world");
+	if (window_width > world_width){
+		world_width = window_width - 20
+		world_canvas.width = world_width
+	}
+	if (window_height > world_height){
+		world_height = window_height - 82
+		world_canvas.height = world_height
+	}
+	console.log("Space for canvas:", world_width, world_height);
+}
 
 function button_start_pause()
 {

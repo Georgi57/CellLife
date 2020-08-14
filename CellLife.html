@@ -15,7 +15,7 @@ Started 2018-09-08
 		<script src="js/cellactions.js"></script>
 	</head>
 
-	<body>
+	<body onload="load_function()">
 
 		<div class="topnav">
 			<a href="../index.html">Home</a>
@@ -37,8 +37,8 @@ Started 2018-09-08
 			</div>
 		</div>
 		
-		<div class="content">
-			<canvas id="world" width="500" height="500" style="border:2px solid #000000;">
+		<div id="world_canvas">
+			<canvas id="world" width="500" height="500" style="border:2px solid black;">
 			</canvas>
 		</div>
 
