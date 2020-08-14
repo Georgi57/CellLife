@@ -66,3 +66,9 @@ Started 2018-09-08
   background-color: #00ff00;
   transition: all 1s;
 }
+
+
+
+#status_bar {
+  overflow: hidden;
+}
