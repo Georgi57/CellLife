@@ -19,12 +19,12 @@ Started 2018-09-08
 
 		<div class="topnav">
 			<a href="../index.html">Home</a>
-			<a class="loader"></a>
+			<a class="loader" id="not_active_loader" onclick="button_start_pause()"></a>
 			<a class="active">CellLife</a>
 			<div class="dropdown">World
 			  	<i class="fa fa-caret-down"></i>
 				<div class="dropdown-content">
-					<a onclick="button_click()">Pause</a>
+					<a id=start-button onclick="button_start_pause()">Live</a>
 					<a href="#">Reset</a>
 				</div>
 			</div>
@@ -36,13 +36,6 @@ Started 2018-09-08
 				</div>
 			</div>
 		</div>
-		
-		<h1>
-			<button id="button" class="startbutton" onclick="button_click()">
-				<span id="buttontext">Start </span>
-			</button> 
-		cell life simulation
-		</h1>
 		
 		<div class="content">
 			<canvas id="world" width="500" height="500" style="border:2px solid #000000;">

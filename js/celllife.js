@@ -18,20 +18,22 @@ var cells_to_delete = [];
 
 cells_act();
 
-function button_click()
+function button_start_pause()
 {
 	if (celllife_running)
 	{
 		celllife_running = false;
-		document.getElementById("buttontext").innerHTML = "Start ";
-		document.getElementById("button").className = "startbutton";
+		document.getElementById("pause-button").innerHTML = "Live";
+		document.getElementById("pause-button").id = "start-button";
+		document.getElementById("active_loader").id = "not_active_loader";
 	}
 	else
 	{
 		celllife_running = true;
-		document.getElementById("buttontext").innerHTML = "Stop ";
-		document.getElementById("button").className = "stopbutton";
-		
+		document.getElementById("start-button").innerHTML = "Pause";
+		document.getElementById("start-button").id = "pause-button";
+		document.getElementById("not_active_loader").id = "active_loader";
+
 		// Clear previous world data
 		cells = [];
 		
