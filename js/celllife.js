@@ -32,15 +32,15 @@ function load_function()
 	console.log("Space for canvas:",window_width, window_height);
 	// Resize the canvas if needed
 	var world_canvas = document.getElementById("world");
-	if (window_width > world_width){
+	if (window_width - 20 > world_width){
 		world_width = window_width - 20
 		world_canvas.width = world_width
 	}
-	if (window_height > world_height){
+	if (window_height - 82 > world_height){
 		world_height = window_height - 82
 		world_canvas.height = world_height
 	}
-	console.log("Space for canvas:", world_width, world_height);
+	console.log("World size:", world_width, world_height);
 }
 
 function button_start_pause()
@@ -73,7 +73,7 @@ function create_new_world()
 {
 	var world_canvas = document.getElementById("world");
 	world_view = world_canvas.getContext("2d");
-	world = world_view.createImageData(world_height,world_width);
+	world = world_view.createImageData(world_width,world_height);
 	for (var i=0;i<world.data.length;i+=4)
 	{
 		world.data[i+0]=50; // red
@@ -82,6 +82,7 @@ function create_new_world()
 		world.data[i+3]=200;
 	}
 	world_view.putImageData(world,0,0);
+	console.log("Space for canvas:", world_width, world_height);
 }
 
 function create_life()
