@@ -32,12 +32,12 @@ function load_function()
 	console.log("Space for canvas:",window_width, window_height);
 	// Resize the canvas if needed
 	var world_canvas = document.getElementById("world");
-	if (window_width - 20 > world_width){
-		world_width = window_width - 20
+	if (window_width - 4 > world_width){
+		world_width = window_width - 4
 		world_canvas.width = world_width
 	}
-	if (window_height - 82 > world_height){
-		world_height = window_height - 82
+	if (window_height - 66 > world_height){
+		world_height = window_height - 66
 		world_canvas.height = world_height
 	}
 	console.log("World size:", world_width, world_height);
