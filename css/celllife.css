@@ -55,6 +55,39 @@ Started 2018-09-08
 /* Show the dropdown menu on hover */
 .dropdown:hover .dropdown-content {display: grid;}
 
+/* The container <div> - needed to position the dropdown content */
+.dropside {
+  float: left;
+  background-color: #f1f1f1;
+  text-align: center;
+  padding: 0px 10px;
+  text-decoration: none;
+  font-size: 17px;
+  display: inline-block;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropside-content {
+  display: none;
+  position: absolute;
+  left: 100px;
+  background-color: #f1f1f1;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+
+/* Links inside the dropdown */
+.dropside-content a {
+  color: black;
+  padding: 10px 10px;
+  text-decoration: none;
+}
+
+/* Change color of dropside links on hover */
+.dropside-content a:hover {background-color: #ddd;}
+
+/* Show the dropside menu on hover */
+.dropside:hover .dropside-content {display: block;}
+
 /* Start/Pause color change on hover */
 #pause-button:hover {
   background-color: #ff0000;
