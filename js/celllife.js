@@ -19,8 +19,7 @@ var world_height = 500;
 var world_width = 500;
 var world;
 var world_view;
-var cells = [];
-var cells_counts = new Array(4);
+var cells = [[],[],[],[],[],[]];
 var cell_total_number = 0;
 
 var cells_to_delete = [];
@@ -58,7 +57,7 @@ function button_start_pause()
 		document.getElementById("not_active_loader").id = "active_loader";
 
 		// Clear previous world data
-		cells = [];
+		cells = [[],[],[],[],[],[]];
 		
 		// Create new world
 		create_new_world();
@@ -93,14 +92,15 @@ function create_life()
 			number: cell_total_number, 	// Cell number
 			x: 0,		// location x
 			y: 0,		// location y
-			type: 'g'
+			energy: 10
 		};
 		
 		cell_total_number += 1;
 		new_cell.x = Math.floor((Math.random() * world_width));
 		new_cell.y = Math.floor((Math.random() * world_height));
 		
-		cells.push(new_cell);
+		// Only green cells are created
+		cells[0].push(new_cell);
 	}
 }
 
@@ -144,43 +144,45 @@ function live()
 	var i;
 	var world_location;
 	
-	// Remove empty cells
-	for (i = 0; i < cells_to_delete.length; i++)
+	// Display current state in the order of visibility of cells
+	// DEAD CELLS
+	for (i = 0; i < cells[5].length; i++)
 	{
-		cells.splice(cells_to_delete.pop(),1);
-	}
-	
-	// Display current state
-	for (i = 0; i < cells.length; i++) {
-		world_location = (cells[i].y*world_width + cells[i].x)*4;
-		
-		if (cells[i].type=='r')
-		{
-			world.data[world_location+0]=150;
-			world.data[world_location+1]=0;
-			world.data[world_location+2]=0;
-		}
-		else if (cells[i].type=='d')
-		{
-			world.data[world_location+0]=0;
-			world.data[world_location+1]=0;
-			world.data[world_location+2]=0;
-		}
-		else if (cells[i].type=='y')
-		{
-			world.data[world_location+0]=200;
-			world.data[world_location+1]=200;
-			world.data[world_location+2]=0;
-		}
-		else
-		{
-			world.data[world_location+0]=0;
-			world.data[world_location+1]=150;
-			world.data[world_location+2]=0;
-		}
-		
+		world_location = (cells[5][i].y*world_width + cells[5][i].x)*4;
+		world.data[world_location+0]=0;
+		world.data[world_location+1]=0;
 		world.data[world_location+2]=0;
 	}
+	
+	// GREEN CELLS
+	for (i = 0; i < cells[0].length; i++)
+	{
+		world_location = (cells[0][i].y*world_width + cells[0][i].x)*4;
+		world.data[world_location+0]=0;
+		world.data[world_location+1]=150;
+		world.data[world_location+2]=0;
+	}
+	// YELLOW CELLS
+	for (i = 0; i < cells[1].length; i++)
+	{
+		world_location = (cells[1][i].y*world_width + cells[1][i].x)*4;
+		world.data[world_location+0]=200;
+		world.data[world_location+1]=200;
+		world.data[world_location+2]=0;
+	}
+	// ORANGE CELLS
+		// TODO
+		
+	// RED CELLS
+	for (i = 0; i < cells[3].length; i++)
+	{
+		world_location = (cells[3][i].y*world_width + cells[3][i].x)*4;
+		world.data[world_location+0]=150;
+		world.data[world_location+1]=0;
+		world.data[world_location+2]=0;
+	}
+	// BROWN CELLS
+		// TODO
 	
 	// Make cells do something
 	// -----------------------
@@ -204,12 +206,12 @@ function live()
 	
 	//console.log(cells_counts);
 	document.getElementById("status_bar").innerHTML = "Stats |" +
-		" Green:"  + cells_counts[0].toString() + 
-		" Yellow:" + cells_counts[1].toString() + 
-		" Orange:" + cells_counts[2].toString() + 
-		" Red:"    + cells_counts[3].toString() + 
-		" Brown:"  + cells_counts[4].toString() + 
-		" Dead:"   + cells_counts[5].toString();
+		" Green:"  + cells[0].length.toString() + 
+		" Yellow:" + cells[1].length.toString() + 
+		" Orange:" + cells[2].length.toString() + 
+		" Red:"    + cells[3].length.toString() + 
+		" Brown:"  + cells[4].length.toString() + 
+		" Dead:"   + cells[5].length.toString();
 	world_view.putImageData(world,0,0);
 	
 	if (celllife_running)
