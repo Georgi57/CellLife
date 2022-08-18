@@ -25,8 +25,6 @@ var cell_total_number = 0;
 
 var cells_to_delete = [];
 
-cells_act();
-
 function load_function()
 {
 	console.log("Space for canvas:",window_width, window_height);
@@ -204,7 +202,14 @@ function live()
 		else if (world.data[i+2]<255) world.data[i+2]++;
 	}
 	
-	console.log(cells.length, cells_counts);
+	//console.log(cells_counts);
+	document.getElementById("status_bar").innerHTML = "Stats |" +
+		" Green:"  + cells_counts[0].toString() + 
+		" Yellow:" + cells_counts[1].toString() + 
+		" Orange:" + cells_counts[2].toString() + 
+		" Red:"    + cells_counts[3].toString() + 
+		" Brown:"  + cells_counts[4].toString() + 
+		" Dead:"   + cells_counts[5].toString();
 	world_view.putImageData(world,0,0);
 	
 	if (celllife_running)

@@ -5,18 +5,18 @@ Started 2020-07-29
 
 function cells_act()
 {
-	cells_counts[0]=0;
-	cells_counts[1]=0;
-	cells_counts[2]=0;
-	cells_counts[3]=0;
+	//			  g y o r b d (green, yellow, orange, red, brown, dead as black)
+	cells_counts=[0,0,0,0,0,0];
 	
 	for (i = 0; i < cells.length; i++)
 	{
 		// Cell count
 		if (cells[i].type == 'g') cells_counts[0]++;
-		else if (cells[i].type == 'r') cells_counts[1]++;
-		else if (cells[i].type == 'y') cells_counts[2]++;
-		else cells_counts[3]++;
+		else if (cells[i].type == 'y') cells_counts[1]++;
+		else if (cells[i].type == 'o') cells_counts[2]++;
+		else if (cells[i].type == 'r') cells_counts[3]++;
+		else if (cells[i].type == 'b') cells_counts[4]++;
+		else cells_counts[5]++;
 		
 		// Chance for green cells to reproduce
 		if (cells[i].type == 'g')
