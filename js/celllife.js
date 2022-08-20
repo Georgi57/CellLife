@@ -89,7 +89,7 @@ function create_new_world()
 }
 
 function create_life()
-{/*
+{
 	// Random green cell allocation
 	for (i = 0; i < 100; i++) {
 		
@@ -108,9 +108,11 @@ function create_life()
 		
 		// Only green cells are created
 		cells[0].push(new_cell);
+		world_cells[new_cell.y][new_cell.x] = [];
 		world_cells[new_cell.y][new_cell.x].push(new_cell);
-	}*/
+	}
 	
+	/*
 	// Some predefined cells for testing
 	var new_cell = {
 		number: 0, 	// Cell number
@@ -145,7 +147,7 @@ function create_life()
 	world_cells[new_cell.y][new_cell.x] = [];
 	world_cells[new_cell.y][new_cell.x].push(new_cell);
 	
-	cell_total_number = 4;
+	cell_total_number = 4;*/
 }
 
 function live()
