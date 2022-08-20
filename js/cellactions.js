@@ -112,7 +112,7 @@ function cells_act()
 			// Chance to mutate
 			else
 			{
-				mutate = Math.floor((Math.random() * 10000));
+				mutate = Math.floor((Math.random() * 1000));
 				
 				if (mutate == 0)
 				{
@@ -122,11 +122,11 @@ function cells_act()
 						type: 'y',				// type of cell
 						x: cells[0][i].x,			// location x
 						y: cells[0][i].y,			// location y
-						energy: 50
+						energy: 30
 					};
 					cell_total_number += 1;
 					
-					cells[0].push(new_y_cell);
+					cells[1].push(new_y_cell);
 					world_cells[new_y_cell.y][new_y_cell.x].push(new_y_cell);
 				}
 			}
@@ -134,12 +134,12 @@ function cells_act()
 		}
 		
 		// Chance to die
-		var death_chance = Math.floor((Math.random() * 10000));
+		var death_chance = Math.floor((Math.random() * 1000));
 		if (death_chance == 0)
 		{
 			cells[0][i].type = 'd';
 			cells[5].push(cells[0][i])
-			cells[0].splice(i,1);
+			if (world_cells[cells[0][i].y][cells[0][i].x] == undefined) world_cells[cells[0][i].y][cells[0][i].x]=[];
 			for (n = 0; n < world_cells[cells[0][i].y][cells[0][i].x].length; n++)
 			{
 				if (cells[0][i].number == world_cells[cells[0][i].y][cells[0][i].x][n].number)
@@ -148,9 +148,10 @@ function cells_act()
 					break;
 				}
 			}
+			cells[0].splice(i,1);
 		}
 	}
-	/*
+	
 	// YELLOW CELL ACTIONS
 	// 1. Chance for yellow cell to eat a green cell
 	// 2. Chance to reproduce
@@ -189,6 +190,17 @@ function cells_act()
 		// Move randomly
 		move_randomly = 1
 		if (move_randomly){
+			
+			// Remove Cell from the current location
+			for (n = 0; n < world_cells[cells[1][i].y][cells[1][i].x].length; n++)
+			{
+				if (cells[1][i].number == world_cells[cells[1][i].y][cells[1][i].x][n].number)
+				{
+					world_cells[cells[1][i].y][cells[1][i].x].splice(n,1);
+					break;
+				}
+			}
+			
 			var direction = Math.floor((Math.random() * 4));
 			switch(direction){
 				case 0:
@@ -201,23 +213,38 @@ function cells_act()
 					break;
 				case 2:
 					cells[1][i].y -= 1;
-					if (cells[1][i].y <= 0) cells[1][i].y += world_height;
+					if (cells[1][i].y < 0) cells[1][i].y += world_height;
 					break;
 				case 3:
 					cells[1][i].x -= 1;
-					if (cells[1][i].x <= 0) cells[1][i].x += world_width;
+					if (cells[1][i].x < 0) cells[1][i].x += world_width;
 					break;
 			}
+			
+			// Add cell to the new location
+			if (world_cells[cells[1][i].y][cells[1][i].x] == undefined) world_cells[cells[1][i].y][cells[1][i].x]=[];
+			world_cells[cells[1][i].y][cells[1][i].x].push(cells[1][i]);
+			
 		}
 		
 		// Chance to die
 		var death_chance = Math.floor((Math.random() * 250));
 		if (death_chance == 0)
 		{
+			cells[1][i].type = 'd';
 			cells[5].push(cells[1][i])
+			if (world_cells[cells[1][i].y][cells[1][i].x] == undefined) world_cells[cells[1][i].y][cells[1][i].x]=[];
+			for (n = 0; n < world_cells[cells[1][i].y][cells[1][i].x].length; n++)
+			{
+				if (cells[1][i].number == world_cells[cells[1][i].y][cells[1][i].x][n].number)
+				{
+					world_cells[cells[1][i].y][cells[1][i].x][n].type = 'd';
+					break;
+				}
+			}
 			cells[1].splice(i,1);
 		}
-	}*/
+	}
 	/*
 	// RED CELL ACTIONS
 	// 1. Chance for red cell to eat a yellow cell
