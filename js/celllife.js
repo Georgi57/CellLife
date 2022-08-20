@@ -19,6 +19,7 @@ var world_height = 500;
 var world_width = 500;
 var world;
 var world_view;
+var world_cells;
 var cells = [[],[],[],[],[],[]];
 var cell_total_number = 0;
 
@@ -78,18 +79,24 @@ function create_new_world()
 		world.data[i+2]=255; // blue
 		world.data[i+3]=200;
 	}
+	world_cells = new Array(world_height);
+	for (var i=0;i<world_height;i++)
+	{
+		world_cells[i] = new Array(world_width);
+	}
 	world_view.putImageData(world,0,0);
 	console.log("Space for canvas:", world_width, world_height);
 }
 
 function create_life()
-{
-	var i;
+{/*
+	// Random green cell allocation
 	for (i = 0; i < 100; i++) {
 		
 		// Cell parameters
 		var new_cell = {
 			number: cell_total_number, 	// Cell number
+			type: 'g',	// type of cell
 			x: 0,		// location x
 			y: 0,		// location y
 			energy: 10
@@ -101,42 +108,44 @@ function create_life()
 		
 		// Only green cells are created
 		cells[0].push(new_cell);
-	}
-}
-
-function search_around(x, y, depth){
-	var result = new Array(3);
-	result[0]=x;
-	result[1]=y;
-	result[2]=0;
+		world_cells[new_cell.y][new_cell.x].push(new_cell);
+	}*/
 	
-	// +X
-	if (world.data[(x+1 + world_height*y)*4]==0 &&
-		world.data[(x+1 + world_height*y)*4+1]==0 &&
-		world.data[(x+1 + world_height*y)*4+2]==0){
-		result[0]=x-1;
-		result[1]=y;
-		result[2]=1;
-		return result;
-	}
-	else if (depth>0){
-		result = search_around(x+1, y, depth-1);
-	}
-	if (result[2]==1) return result;
+	// Some predefined cells for testing
+	var new_cell = {
+		number: 0, 	// Cell number
+		type: 'g',	// type of cell
+		x: 1,		// location x
+		y: 1,		// location y
+		energy: 100
+	};
+	cells[0].push(new_cell);
+	world_cells[new_cell.y][new_cell.x] = [];
+	world_cells[new_cell.y][new_cell.x].push(new_cell);
 	
-	// -X
-	if (world.data[(x-1 + world_height*y)*4]==0 &&
-		world.data[(x-1 + world_height*y)*4+1]==0 &&
-		world.data[(x-1 + world_height*y)*4+2]==0){
-		result[0]=x+1;
-		result[1]=y;
-		result[2]=1;
-		return result;
-	}
-	else if (depth>0){
-		result = search_around(x-1, y, depth-1);
-	}
-	return result;
+	var new_cell = {
+		number: 1, 	// Cell number
+		type: 'g',	// type of cell
+		x: 51,		// location x
+		y: 50,		// location y
+		energy: 100
+	};
+	cells[0].push(new_cell);
+	world_cells[new_cell.y][new_cell.x] = [];
+	world_cells[new_cell.y][new_cell.x].push(new_cell);
+	
+	var new_cell = {
+		number: 2, 	// Cell number
+		type: 'g',	// type of cell
+		x: world_width-2,		// location x
+		y: world_height-2,		// location y
+		energy: 100
+	};
+	cells[0].push(new_cell);
+	world_cells[new_cell.y][new_cell.x] = [];
+	world_cells[new_cell.y][new_cell.x].push(new_cell);
+	
+	cell_total_number = 4;
 }
 
 function live()
