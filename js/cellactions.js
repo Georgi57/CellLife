@@ -134,7 +134,7 @@ function cells_act()
 		}
 		
 		// Chance to die
-		var death_chance = Math.floor((Math.random() * 1000));
+		var death_chance = Math.floor((Math.random() * 200));
 		if (death_chance == 0)
 		{
 			cells[0][i].type = 'd';
@@ -153,7 +153,7 @@ function cells_act()
 	}
 	
 	// YELLOW CELL ACTIONS
-	// 1. Chance for yellow cell to eat a green cell
+	// 1. Yellow cells get energy by eating green cells
 	// 2. Chance to reproduce
 	for (i = 0; i < cells[1].length; i++)
 	{
@@ -164,10 +164,20 @@ function cells_act()
 			if (cells[1][i].x == cells[0][n].x && cells[1][i].y == cells[0][n].y && i!==n)
 			{
 				// Chance to eat another cell
-				var type = Math.floor((Math.random() * 10));
-				if (type==0 || type==1)
+				var type = Math.floor((Math.random() * 100));
+				if (type>=0 && type<=49)
 				{
+
+					for (k = 0; k < world_cells[cells[0][n].y][cells[0][n].x].length; k++)
+					{
+						if (cells[0][n].number == world_cells[cells[0][n].y][cells[0][n].x][k].number)
+						{
+							world_cells[cells[0][n].y][cells[0][n].x].splice(k,1);
+							break;
+						}
+					}
 					cells[0].splice(n,1);
+					
 					// Smaller chance to reproduce
 					if (type==0)
 					{
@@ -181,6 +191,7 @@ function cells_act()
 						};
 						cell_total_number += 1;
 						cells[1].push(new_cell);
+						world_cells[new_cell.y][new_cell.x].push(new_cell);
 					}
 				}
 				break;
@@ -190,6 +201,9 @@ function cells_act()
 		// Move randomly
 		move_randomly = 1
 		if (move_randomly){
+			
+			// Cell loses energy on movement
+			cells[1][i].energy -= 1;
 			
 			// Remove Cell from the current location
 			for (n = 0; n < world_cells[cells[1][i].y][cells[1][i].x].length; n++)
@@ -224,11 +238,10 @@ function cells_act()
 			// Add cell to the new location
 			if (world_cells[cells[1][i].y][cells[1][i].x] == undefined) world_cells[cells[1][i].y][cells[1][i].x]=[];
 			world_cells[cells[1][i].y][cells[1][i].x].push(cells[1][i]);
-			
 		}
 		
 		// Chance to die
-		var death_chance = Math.floor((Math.random() * 250));
+		var death_chance = Math.floor((Math.random() * 200));
 		if (death_chance == 0)
 		{
 			cells[1][i].type = 'd';
@@ -329,9 +342,8 @@ function cells_act()
 		this_cell.energy -= 1;
 		
 		// If no energy left, remove the cell
-		if (this_cell.energy == 0)
+		if (this_cell.energy <= 0)
 		{	
-			cells[5].splice(i,1);
 			for (n = 0; n < world_cells[this_cell.y][this_cell.x].length; n++)
 			{
 				if (this_cell.number == world_cells[this_cell.y][this_cell.x][n].number)
@@ -340,6 +352,7 @@ function cells_act()
 					break;
 				}
 			}
+			cells[5].splice(i,1);
 		}
 	}
 }

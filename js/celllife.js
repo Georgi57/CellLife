@@ -63,6 +63,7 @@ function button_start_pause()
 		// Create new world
 		create_new_world();
 		create_life();
+		//create_test_cells();
 		live();
 	}
 }
@@ -111,43 +112,6 @@ function create_life()
 		world_cells[new_cell.y][new_cell.x] = [];
 		world_cells[new_cell.y][new_cell.x].push(new_cell);
 	}
-	
-	/*
-	// Some predefined cells for testing
-	var new_cell = {
-		number: 0, 	// Cell number
-		type: 'g',	// type of cell
-		x: 1,		// location x
-		y: 1,		// location y
-		energy: 100
-	};
-	cells[0].push(new_cell);
-	world_cells[new_cell.y][new_cell.x] = [];
-	world_cells[new_cell.y][new_cell.x].push(new_cell);
-	
-	var new_cell = {
-		number: 1, 	// Cell number
-		type: 'g',	// type of cell
-		x: 51,		// location x
-		y: 50,		// location y
-		energy: 100
-	};
-	cells[0].push(new_cell);
-	world_cells[new_cell.y][new_cell.x] = [];
-	world_cells[new_cell.y][new_cell.x].push(new_cell);
-	
-	var new_cell = {
-		number: 2, 	// Cell number
-		type: 'g',	// type of cell
-		x: world_width-2,		// location x
-		y: world_height-2,		// location y
-		energy: 100
-	};
-	cells[0].push(new_cell);
-	world_cells[new_cell.y][new_cell.x] = [];
-	world_cells[new_cell.y][new_cell.x].push(new_cell);
-	
-	cell_total_number = 4;*/
 }
 
 function live()
@@ -201,6 +165,7 @@ function live()
 	cells_act();
 	
 	// -----------------------
+	//check_cell_consistency();
 	
 	// Fade the traces of cells
 	for (i = 0; i < world_height*world_width*4; i+=4)
