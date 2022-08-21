@@ -20,7 +20,8 @@ var world_width = 500;
 var world;
 var world_view;
 var world_cells;
-var cells = [[],[],[],[],[],[]];
+var world_time = 0;
+var celllife_delay = 10;
 var cell_total_number = 0;
 
 var cells_to_delete = [];
@@ -99,7 +100,7 @@ function create_life()
 			number: cell_total_number, 	// Cell number
 			type: 'g',	// type of cell
 			energy: 10,
-			last_action: lifetime
+			last_action: world_time
 		};
 		
 		cell_total_number += 1;
@@ -209,6 +210,6 @@ function live()
 	
 	if (celllife_running)
 	{
-		setTimeout(live, 10);
+		setTimeout(live, celllife_delay);
 	}
 }

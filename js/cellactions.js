@@ -3,9 +3,6 @@ Written by Georgi Olentsenko for CellLife project
 Started 2020-07-29
 */
 
-// Overall lifetime of the world
-var lifetime = 0;
-
 // Cell counts
 var green_count = 0;
 var yellow_count = 0;
@@ -17,8 +14,8 @@ var green_cell_reproduce_energy = 100;
 
 function cells_act()
 {
-	// Increase lifetime fo the world
-	lifetime += 1;
+	// One cycle increases world time
+	world_time += 1;
 	
 	// Reset cell counts
 	green_count = 0;
@@ -133,13 +130,12 @@ function cells_act()
 							var new_cell = {
 								number: cell_total_number, 	// Cell number
 								type: 'g',					// Type of cell
-								x: new_x,					// Location x
-								y: new_y,					// Location y
-								energy: 40
+								energy: 40,
+								last_action: world_time
 							};
 							cell_total_number += 1;
 							
-							world_cells[new_cell.y][new_cell.x].push(new_cell);
+							world_cells[new_y][new_x].push(new_cell);
 						}
 						// Chance to mutate
 						else
@@ -153,7 +149,7 @@ function cells_act()
 									number: cell_total_number, 	// Cell number
 									type: 'y',				// type of cell
 									energy: 40,
-									last_action: lifetime
+									last_action: world_time
 								};
 								cell_total_number += 1;
 								
@@ -176,8 +172,9 @@ function cells_act()
 				// YELLOW CELL ACTIONS
 				// 1. Yellow cells get energy by eating green cells
 				// 2. Chance to reproduce
-				if (this_cell.type == 'y' && this_cell.last_action !== lifetime)
+				if (this_cell.type == 'y' && this_cell.last_action !== world_time)
 				{
+					this_cell.last_action = world_time;
 					yellow_count += 1;
 					
 					// Go throguh cells placed in this location
