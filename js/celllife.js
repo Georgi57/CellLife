@@ -98,19 +98,17 @@ function create_life()
 		var new_cell = {
 			number: cell_total_number, 	// Cell number
 			type: 'g',	// type of cell
-			x: 0,		// location x
-			y: 0,		// location y
-			energy: 10
+			energy: 10,
+			last_action: lifetime
 		};
 		
 		cell_total_number += 1;
-		new_cell.x = Math.floor((Math.random() * world_width));
-		new_cell.y = Math.floor((Math.random() * world_height));
+		new_x = Math.floor((Math.random() * world_width));
+		new_y = Math.floor((Math.random() * world_height));
 		
 		// Only green cells are created
-		cells[0].push(new_cell);
-		world_cells[new_cell.y][new_cell.x] = [];
-		world_cells[new_cell.y][new_cell.x].push(new_cell);
+		world_cells[new_y][new_x] = [];
+		world_cells[new_y][new_x].push(new_cell);
 	}
 }
 
@@ -120,44 +118,64 @@ function live()
 	var world_location;
 	
 	// Display current state in the order of visibility of cells
-	// DEAD CELLS
-	for (i = 0; i < cells[5].length; i++)
-	{
-		world_location = (cells[5][i].y*world_width + cells[5][i].x)*4;
-		world.data[world_location+0]=0;
-		world.data[world_location+1]=0;
-		world.data[world_location+2]=0;
-	}
 	
-	// GREEN CELLS
-	for (i = 0; i < cells[0].length; i++)
+	// Go through all world locations
+	for (x = 0; x < world_width; x++)
 	{
-		world_location = (cells[0][i].y*world_width + cells[0][i].x)*4;
-		world.data[world_location+0]=0;
-		world.data[world_location+1]=150;
-		world.data[world_location+2]=0;
+		for (y = 0; y < world_height; y++)
+		{
+			found_green = false;
+			found_yellow = false;
+			found_orange = false;
+			found_red = false;
+			found_brown = false;
+			found_dead = false;
+			
+			// Check if the location is defined at all
+			if (world_cells[y][x] == undefined) continue;
+			
+			// Go throguh cells placed in this location and check for cell types
+			for (i = world_cells[y][x].length-1; i >= 0; i--)
+			{
+				if (world_cells[y][x][i].type == 'g') found_green = true;
+				else if (world_cells[y][x][i].type == 'y') found_yellow = true;
+				else if (world_cells[y][x][i].type == 'o') found_orange = true;
+				else if (world_cells[y][x][i].type == 'r') found_red = true;
+				else if (world_cells[y][x][i].type == 'b') found_brown = true;
+				else if (world_cells[y][x][i].type == 'd') found_dead = true;
+			}
+			
+			// Visualize the cells according to priority
+			if (found_red)
+			{
+				world_location = (y*world_width + x)*4;
+				world.data[world_location+0]=150;
+				world.data[world_location+1]=0;
+				world.data[world_location+2]=0;
+			}
+			else if (found_yellow)
+			{
+				world_location = (y*world_width + x)*4;
+				world.data[world_location+0]=200;
+				world.data[world_location+1]=200;
+				world.data[world_location+2]=0;
+			}
+			else if (found_green)
+			{
+				world_location = (y*world_width + x)*4;
+				world.data[world_location+0]=0;
+				world.data[world_location+1]=150;
+				world.data[world_location+2]=0;
+			}
+			else if (found_dead)
+			{
+				world_location = (y*world_width + x)*4;
+				world.data[world_location+0]=0;
+				world.data[world_location+1]=0;
+				world.data[world_location+2]=0;
+			}
+		}
 	}
-	// YELLOW CELLS
-	for (i = 0; i < cells[1].length; i++)
-	{
-		world_location = (cells[1][i].y*world_width + cells[1][i].x)*4;
-		world.data[world_location+0]=200;
-		world.data[world_location+1]=200;
-		world.data[world_location+2]=0;
-	}
-	// ORANGE CELLS
-		// TODO
-		
-	// RED CELLS
-	for (i = 0; i < cells[3].length; i++)
-	{
-		world_location = (cells[3][i].y*world_width + cells[3][i].x)*4;
-		world.data[world_location+0]=150;
-		world.data[world_location+1]=0;
-		world.data[world_location+2]=0;
-	}
-	// BROWN CELLS
-		// TODO
 	
 	// Make cells do something
 	// -----------------------
@@ -165,7 +183,6 @@ function live()
 	cells_act();
 	
 	// -----------------------
-	//check_cell_consistency();
 	
 	// Fade the traces of cells
 	for (i = 0; i < world_height*world_width*4; i+=4)
@@ -182,12 +199,12 @@ function live()
 	
 	//console.log(cells_counts);
 	document.getElementById("status_bar").innerHTML = "Stats |" +
-		" Green:"  + cells[0].length.toString() + 
-		" Yellow:" + cells[1].length.toString() + 
-		" Orange:" + cells[2].length.toString() + 
-		" Red:"    + cells[3].length.toString() + 
-		" Brown:"  + cells[4].length.toString() + 
-		" Dead:"   + cells[5].length.toString();
+		" Green:"  + green_count + 
+		" Yellow:" + yellow_count +
+		" Orange:" + 0 +
+		" Red:"    + 0 + 
+		" Brown:"  + 0 +
+		" Dead:"   + dead_count;
 	world_view.putImageData(world,0,0);
 	
 	if (celllife_running)
