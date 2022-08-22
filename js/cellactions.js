@@ -12,6 +12,9 @@ var dead_count = 0;
 var green_cell_max_energy = 200;
 var green_cell_reproduce_energy = 100;
 
+var yellow_cell_max_energy = 1000;
+var yellow_cell_reproduce_energy = 500;
+
 function cells_act()
 {
 	// One cycle increases world time
@@ -34,7 +37,7 @@ function cells_act()
 			for (i = world_cells[y][x].length-1; i >= 0; i--)
 			{
 				// Simplify cell addressing
-				this_cell = world_cells[y][x][i];
+				var this_cell = world_cells[y][x][i];
 				
 				
 				
@@ -140,12 +143,13 @@ function cells_act()
 						// Chance to mutate
 						else
 						{
-							mutate = Math.floor((Math.random() * 1000));
+							mutate = Math.floor((Math.random() * 100000));
 							
 							if (mutate == 0)
 							{
+								console.log(mutate, "mutation!")
 								// Cell parameters
-								var new_cell = {
+								var new_y_cell = {
 									number: cell_total_number, 	// Cell number
 									type: 'y',				// type of cell
 									energy: 40,
@@ -153,7 +157,7 @@ function cells_act()
 								};
 								cell_total_number += 1;
 								
-								world_cells[y][x].push(new_cell);
+								world_cells[y][x].push(new_y_cell);
 							}
 						}
 						
@@ -176,6 +180,7 @@ function cells_act()
 				{
 					this_cell.last_action = world_time;
 					yellow_count += 1;
+					console.log(this_cell.number, x, y, this_cell.energy);
 					
 					// Go throguh cells placed in this location
 					for (j = world_cells[y][x].length-1; j >= 0; j--)
@@ -186,24 +191,32 @@ function cells_act()
 							var eat = Math.floor((Math.random() * 100));
 							if (eat>=0 && eat<=49)
 							{
-								// Smaller chance to reproduce
-								if (eat==0)
-								{
-									this_cell.type = 'y';
-									this_cell.energy = 30;
-								}
-								else
-								{
-									world_cells[y][x].splice(j,1);
-								}
+								this_cell.energy += world_cells[y][x][j].energy;
+								world_cells[y][x].splice(j,1);
 							}
 							break;
 						}
 					}
 					
-					// Move randomly
-					move_randomly = 1
-					if (move_randomly){
+					// Reproduce if there is enough energy
+					if (this_cell.energy > yellow_cell_reproduce_energy)
+					{
+						// This cell looses energy on reproduction
+						this_cell.energy -= 300;
+						
+						// Cell parameters
+						var new_cell = {
+							number: cell_total_number,
+							type: 'y',
+							energy: 50,
+							last_action: world_time
+						};
+						cell_total_number += 1;
+						
+						world_cells[y][x].push(new_cell);
+					}
+					else
+					{
 						
 						// Cell loses energy on movement
 						this_cell.energy -= 1;
@@ -236,7 +249,7 @@ function cells_act()
 					}
 					
 					// Chance to die
-					var death_chance = Math.floor((Math.random() * 200));
+					var death_chance = Math.floor((Math.random() * (100+this_cell.energy)));
 					if (death_chance == 0)
 					{
 						this_cell.type = 'd';
