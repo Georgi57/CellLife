@@ -141,7 +141,7 @@ function cells_act()
 						// Chance to mutate
 						else
 						{
-							mutate = Math.floor((Math.random() * 50000));
+							mutate = Math.floor((Math.random() * 1000000));
 							
 							if (mutate == 0)
 							{
