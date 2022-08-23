@@ -24,7 +24,7 @@ var world_time = 0;
 var celllife_delay = 10;
 var cell_total_number = 0;
 
-var cells_to_delete = [];
+var celllife_created = false;
 
 function load_function()
 {
@@ -57,16 +57,24 @@ function button_start_pause()
 		document.getElementById("start-button").innerHTML = "Pause";
 		document.getElementById("start-button").id = "pause-button";
 		document.getElementById("not_active_loader").id = "active_loader";
-
-		// Clear previous world data
-		cells = [[],[],[],[],[],[]];
 		
-		// Create new world
-		create_new_world();
-		create_life();
-		//create_test_cells();
+		if (!celllife_created)
+		{
+			// Create new world
+			create_new_world();
+			create_life();
+			//create_test_cells();
+			celllife_created = true;
+		}
 		live();
 	}
+}
+
+function reset_world()
+{
+	// Recreate the world and cells
+	create_new_world();
+	create_life();
 }
 
 function create_new_world()

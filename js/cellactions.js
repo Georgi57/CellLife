@@ -145,7 +145,6 @@ function cells_act()
 							
 							if (mutate == 0)
 							{
-								console.log(mutate, "mutation!")
 								// Cell parameters
 								new_y_cell = {
 									number: cell_total_number, 	// Cell number
@@ -178,8 +177,6 @@ function cells_act()
 				{
 					world_cells[y][x][i].last_action = world_time;
 					yellow_count += 1;
-					console.log(world_cells[y][x][i].number, x, y, world_cells[y][x][i].energy);
-					
 					
 					// Chance to die
 					var death_chance = Math.floor((Math.random() * (100+world_cells[y][x][i].energy/10)));
