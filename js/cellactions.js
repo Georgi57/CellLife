@@ -25,6 +25,9 @@ function cells_act()
 	yellow_count = 0;
 	dead_count = 0;
 	
+	// Placeholder for checks
+	//check_world_cells_for_issues();
+	
 	// Go through all world locations
 	for (x = 0; x < world_width; x++)
 	{
