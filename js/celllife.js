@@ -96,7 +96,7 @@ function create_life()
 	for (i = 0; i < 100; i++) {
 		
 		// Cell parameters
-		var new_cell = {
+		new_cell = {
 			number: cell_total_number, 	// Cell number
 			type: 'g',	// type of cell
 			energy: 10,

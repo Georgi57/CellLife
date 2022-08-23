@@ -36,29 +36,24 @@ function cells_act()
 			// Go throguh cells placed in this location
 			for (i = world_cells[y][x].length-1; i >= 0; i--)
 			{
-				// Simplify cell addressing
-				var this_cell = world_cells[y][x][i];
-				
-				
-				
 				// GREEN CELL ACTIONS
 				// 1. Grow by increasing energy
 				// 2. Reproduce if the cell accumulated enough energy
 				// 2.1. If there is space around reproduce as green
 				// 2.2. If there is not enough space around give a chance to mutate to yellow
 				// 3. There is a chance to die
-				if (this_cell.type == 'g')
+				if (world_cells[y][x][i].type == 'g')
 				{
 					green_count += 1;
 					
 					// Increase energy
-					if (this_cell.energy < green_cell_max_energy)
+					if (world_cells[y][x][i].energy < green_cell_max_energy)
 					{
-						this_cell.energy += 1;
+						world_cells[y][x][i].energy += 1;
 					}
 					
 					// Reproduce if there is enough energy
-					if (this_cell.energy > green_cell_reproduce_energy)
+					if (world_cells[y][x][i].energy > green_cell_reproduce_energy)
 					{
 						// Search around for space without green cells
 						// Tries in all directions
@@ -127,10 +122,10 @@ function cells_act()
 						if (space_found)
 						{
 							// This cell looses energy on reproduction
-							this_cell.energy -= 60;
+							world_cells[y][x][i].energy -= 60;
 							
 							// Cell parameters
-							var new_cell = {
+							new_cell = {
 								number: cell_total_number, 	// Cell number
 								type: 'g',					// Type of cell
 								energy: 40,
@@ -143,13 +138,13 @@ function cells_act()
 						// Chance to mutate
 						else
 						{
-							mutate = Math.floor((Math.random() * 100000));
+							mutate = Math.floor((Math.random() * 50000));
 							
 							if (mutate == 0)
 							{
 								console.log(mutate, "mutation!")
 								// Cell parameters
-								var new_y_cell = {
+								new_y_cell = {
 									number: cell_total_number, 	// Cell number
 									type: 'y',				// type of cell
 									energy: 40,
@@ -167,7 +162,7 @@ function cells_act()
 					var death_chance = Math.floor((Math.random() * 150));
 					if (death_chance == 0)
 					{
-						this_cell.type = 'd';
+						world_cells[y][x][i].type = 'd';
 					}
 				}
 				
@@ -176,83 +171,95 @@ function cells_act()
 				// YELLOW CELL ACTIONS
 				// 1. Yellow cells get energy by eating green cells
 				// 2. Chance to reproduce
-				if (this_cell.type == 'y' && this_cell.last_action !== world_time)
+				else if (world_cells[y][x][i].type == 'y' && world_cells[y][x][i].last_action !== world_time)
 				{
-					this_cell.last_action = world_time;
+					world_cells[y][x][i].last_action = world_time;
 					yellow_count += 1;
-					console.log(this_cell.number, x, y, this_cell.energy);
+					console.log(world_cells[y][x][i].number, x, y, world_cells[y][x][i].energy);
 					
-					// Go throguh cells placed in this location
-					for (j = world_cells[y][x].length-1; j >= 0; j--)
-					{
-						if (world_cells[y][x][j].type == 'g')
-						{
-							// Chance to eat another cell
-							var eat = Math.floor((Math.random() * 100));
-							if (eat>=0 && eat<=49)
-							{
-								this_cell.energy += world_cells[y][x][j].energy;
-								world_cells[y][x].splice(j,1);
-							}
-							break;
-						}
-					}
 					
-					// Reproduce if there is enough energy
-					if (this_cell.energy > yellow_cell_reproduce_energy)
+					// Chance to die
+					var death_chance = Math.floor((Math.random() * (100+world_cells[y][x][i].energy/10)));
+					if (death_chance == 0)
 					{
-						// This cell looses energy on reproduction
-						this_cell.energy -= 300;
-						
-						// Cell parameters
-						var new_cell = {
-							number: cell_total_number,
-							type: 'y',
-							energy: 50,
-							last_action: world_time
-						};
-						cell_total_number += 1;
-						
-						world_cells[y][x].push(new_cell);
+						world_cells[y][x][i].type = 'd';
 					}
 					else
 					{
-						
-						// Cell loses energy on movement
-						this_cell.energy -= 1;
-						
-						var direction = Math.floor((Math.random() * 4));
-						switch(direction){
-							case 0:
-								new_y += 1;
-								if (new_y >= world_height) new_y -= world_height;
-								break;
-							case 1:
-								new_x += 1;
-								if (new_x >= world_width) new_x -= world_width;
-								break;
-							case 2:
-								new_y -= 1;
-								if (new_y < 0) new_y += world_height;
-								break;
-							case 3:
-								new_x -= 1;
-								if (new_x < 0) new_x += world_width;
-								break;
+						// Reproduce if there is enough energy
+						if (world_cells[y][x][i].energy > yellow_cell_reproduce_energy)
+						{
+							// This cell looses energy on reproduction
+							world_cells[y][x][i].energy -= 300;
+							
+							// Cell parameters
+							new_cell = {
+								number: cell_total_number,
+								type: 'y',
+								energy: 50,
+								last_action: world_time
+							};
+							cell_total_number += 1;
+							
+							world_cells[y][x].push(new_cell);
 						}
-						
-						// Add cell to the new location
-						if (world_cells[new_y][new_x] == undefined) world_cells[new_y][new_x]=[];
-						world_cells[new_y][new_x].push(this_cell);
-						// Remove cell from the current location
-						world_cells[y][x].splice(i,1);
-					}
-					
-					// Chance to die
-					var death_chance = Math.floor((Math.random() * (100+this_cell.energy)));
-					if (death_chance == 0)
-					{
-						this_cell.type = 'd';
+						else
+						{
+							
+							// Go throguh cells placed in this location to see if the cell can eat
+							yellow_found_food = false;
+							for (j = world_cells[y][x].length-1; j >= 0; j--)
+							{
+								if (world_cells[y][x][j].type == 'g')
+								{
+									// Chance to eat another cell
+									var eat = Math.floor((Math.random() * 100));
+									if (eat>=0 && eat<=49)
+									{
+										yellow_found_food = true;
+										world_cells[y][x][i].energy += world_cells[y][x][j].energy;
+										world_cells[y][x].splice(j,1);
+									}
+									break;
+								}
+							}
+							
+							if (!yellow_found_food)
+							{
+								// Cell loses energy on movement
+								world_cells[y][x][i].energy -= 1;
+								
+								var direction = Math.floor((Math.random() * 4));
+								switch(direction){
+									case 0:
+										new_y = y + 1;
+										if (new_y >= world_height) new_y -= world_height;
+										new_x = x;
+										break;
+									case 1:
+										new_x = x + 1;
+										if (new_x >= world_width) new_x -= world_width;
+										new_y = y;
+										break;
+									case 2:
+										new_y = y - 1;
+										if (new_y < 0) new_y += world_height;
+										new_x = x;
+										break;
+									case 3:
+										new_x = x - 1;
+										if (new_x < 0) new_x += world_width;
+										new_y = y;
+										break;
+								}
+								
+								// Add cell to the new location
+								if (world_cells[new_y][new_x] == undefined) world_cells[new_y][new_x]=[];
+								world_cells[new_y][new_x].push(world_cells[y][x][i]);
+								// Remove cell from the current location
+								world_cells[y][x].splice(i,1);
+							}
+						}
 					}
 				}
 				
@@ -261,12 +268,12 @@ function cells_act()
 				// DEAD CELL ACTIONS
 				// 1. Disolve over time
 				// 2. If no energy left - remove
-				if (this_cell.type == 'd')
+				else if (world_cells[y][x][i].type == 'd')
 				{
 					dead_count += 1;
 					
 					// Decrease Cell energy
-					this_cell.energy -= 1;
+					world_cells[y][x][i].energy -= 1;
 					
 					// If no energy left, remove the cell
 					world_cells[y][x].splice(i,1);
@@ -358,7 +365,7 @@ function search_around(this_cell, x, y, searched_type, distance){
 	// Check the current spot
 	for (n = 0; n < world_cells[y][x].length; n++)
 	{
-		if (this_cell.number !== world_cells[y][x][n].number &&
+		if (world_cells[y][x][i].number !== world_cells[y][x][n].number &&
 			searched_type == world_cells[y][x][n].type)
 		{
 			// found
@@ -369,19 +376,19 @@ function search_around(this_cell, x, y, searched_type, distance){
 	
 	// Consider the positions around recursively
 	for (i = distance-1; i > 0; i++){
-		result = search_around(this_cell, x+1, y, searched_type, i);
+		result = search_around(world_cells[y][x][i], x+1, y, searched_type, i);
 		if (result[3] == 1){
 			return result;
 		}
-		result = search_around(this_cell, x, y+1, searched_type, i);
+		result = search_around(world_cells[y][x][i], x, y+1, searched_type, i);
 		if (result[3] == 1){
 			return result;
 		}
-		result = search_around(this_cell, x-1, y, searched_type, i);
+		result = search_around(world_cells[y][x][i], x-1, y, searched_type, i);
 		if (result[3] == 1){
 			return result;
 		}
-		result = search_around(this_cell, x, y-1, searched_type, i);
+		result = search_around(world_cells[y][x][i], x, y-1, searched_type, i);
 		if (result[3] == 1){
 			return result;
 		}
