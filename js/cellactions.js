@@ -132,6 +132,7 @@ function cells_act()
 								number: cell_total_number, 	// Cell number
 								type: 'g',					// Type of cell
 								energy: 40,
+								birth: world_time,
 								last_action: world_time
 							};
 							cell_total_number += 1;
@@ -141,6 +142,7 @@ function cells_act()
 						// Chance to mutate
 						else
 						{
+							// One in a million
 							mutate = Math.floor((Math.random() * 1000000));
 							
 							if (mutate == 0)
@@ -150,6 +152,7 @@ function cells_act()
 									number: cell_total_number, 	// Cell number
 									type: 'y',				// type of cell
 									energy: 40,
+									birth: world_time,
 									last_action: world_time
 								};
 								cell_total_number += 1;
@@ -197,6 +200,7 @@ function cells_act()
 								number: cell_total_number,
 								type: 'y',
 								energy: 50,
+								birth: world_time,
 								last_action: world_time
 							};
 							cell_total_number += 1;
@@ -276,7 +280,10 @@ function cells_act()
 					world_cells[y][x][i].energy -= 1;
 					
 					// If no energy left, remove the cell
-					world_cells[y][x].splice(i,1);
+					if (world_cells[y][x][i].energy <= 0)
+					{
+						world_cells[y][x].splice(i,1);
+					}
 				}
 			}
 		}

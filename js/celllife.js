@@ -107,7 +107,8 @@ function create_life()
 		new_cell = {
 			number: cell_total_number, 	// Cell number
 			type: 'g',	// type of cell
-			energy: 10,
+			energy: Math.floor((Math.random() * 100)),
+			birth: world_time,
 			last_action: world_time
 		};
 		
