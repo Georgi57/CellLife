@@ -17,12 +17,17 @@ var window_height = window.innerHeight
 // World parameters
 var world_height = 500;
 var world_width = 500;
+var world_resized = false;
+var world_height_resized;
+var world_width_resized;
 var world;
 var world_view;
-var cells = [[],[],[],[],[],[]];
+var world_cells;
+var world_time = 0;
+var celllife_delay = 10;
 var cell_total_number = 0;
 
-var cells_to_delete = [];
+var celllife_created = false;
 
 function load_function()
 {
@@ -55,15 +60,76 @@ function button_start_pause()
 		document.getElementById("start-button").innerHTML = "Pause";
 		document.getElementById("start-button").id = "pause-button";
 		document.getElementById("not_active_loader").id = "active_loader";
-
-		// Clear previous world data
-		cells = [[],[],[],[],[],[]];
 		
-		// Create new world
-		create_new_world();
-		create_life();
+		if (!celllife_created)
+		{
+			// Create new world
+			create_new_world();
+			create_life();
+			//create_test_cells();
+			celllife_created = true;
+		}
 		live();
 	}
+}
+
+function reset_world()
+{
+	// Recreate the world and cells
+	create_new_world();
+	create_life();
+}
+
+function resize_world()
+{
+	world_height_resized = Number(prompt("Enter HEIGHT of the world", "500"));
+	world_width_resized = Number(prompt("Enter WIDTH of the world", "500"));
+	world_resized = true;
+	
+	// Only update the world if life is not running. Otherwise wait until an end of a cycle
+	if (!celllife_running)
+	{
+		update_resized_world();
+	}
+}
+
+function update_resized_world()
+{
+	// Fill the previous world space with emptiness
+	for (i = 0; i < world_height; i+=1)
+	{
+		for (j = 0; j < world_width; j+=1)
+		{
+			// Old world location
+			old_loc = (i*world_width + j)*4;
+			
+			// Emptiness if out of bounds of teh new world
+			if (i > world_height_resized - 1 || j > world_width_resized - 1)
+			{
+				world.data[old_loc+0]=51;
+				world.data[old_loc+1]=51;
+				world.data[old_loc+2]=51;
+				world.data[old_loc+3]=255;
+			}
+		}
+	}
+	world_view.putImageData(world,0,0);
+
+	// Cut the the world_cells array
+	if (world_height_resized < world_height)
+		world_cells.splice(world_height_resized, world_height - world_height_resized);
+	if (world_width_resized < world_width)
+	{
+		for (var i=0;i<world_height_resized;i++)
+		{
+			world_cells[i].splice(world_width_resized, world_width - world_width_resized);
+		}
+	}
+		
+	// Now adjust the main world size variables
+	world_height = world_height_resized;
+	world_width = world_width_resized;
+	world_resized = false;
 }
 
 function create_new_world()
@@ -79,64 +145,36 @@ function create_new_world()
 		world.data[i+3]=200;
 	}
 	world_view.putImageData(world,0,0);
-	console.log("Space for canvas:", world_width, world_height);
+	
+	world_cells = new Array(world_height);
+	for (var i=0;i<world_height;i++)
+	{
+		world_cells[i] = new Array(world_width);
+	}
 }
 
 function create_life()
 {
-	var i;
+	// Random green cell allocation
 	for (i = 0; i < 100; i++) {
 		
 		// Cell parameters
-		var new_cell = {
+		new_cell = {
 			number: cell_total_number, 	// Cell number
-			x: 0,		// location x
-			y: 0,		// location y
-			energy: 10
+			type: 'g',	// type of cell
+			energy: Math.floor((Math.random() * 100)),
+			birth: world_time,
+			last_action: world_time
 		};
 		
 		cell_total_number += 1;
-		new_cell.x = Math.floor((Math.random() * world_width));
-		new_cell.y = Math.floor((Math.random() * world_height));
+		new_x = Math.floor((Math.random() * world_width));
+		new_y = Math.floor((Math.random() * world_height));
 		
 		// Only green cells are created
-		cells[0].push(new_cell);
+		world_cells[new_y][new_x] = [];
+		world_cells[new_y][new_x].push(new_cell);
 	}
-}
-
-function search_around(x, y, depth){
-	var result = new Array(3);
-	result[0]=x;
-	result[1]=y;
-	result[2]=0;
-	
-	// +X
-	if (world.data[(x+1 + world_height*y)*4]==0 &&
-		world.data[(x+1 + world_height*y)*4+1]==0 &&
-		world.data[(x+1 + world_height*y)*4+2]==0){
-		result[0]=x-1;
-		result[1]=y;
-		result[2]=1;
-		return result;
-	}
-	else if (depth>0){
-		result = search_around(x+1, y, depth-1);
-	}
-	if (result[2]==1) return result;
-	
-	// -X
-	if (world.data[(x-1 + world_height*y)*4]==0 &&
-		world.data[(x-1 + world_height*y)*4+1]==0 &&
-		world.data[(x-1 + world_height*y)*4+2]==0){
-		result[0]=x+1;
-		result[1]=y;
-		result[2]=1;
-		return result;
-	}
-	else if (depth>0){
-		result = search_around(x-1, y, depth-1);
-	}
-	return result;
 }
 
 function live()
@@ -144,45 +182,67 @@ function live()
 	var i;
 	var world_location;
 	
-	// Display current state in the order of visibility of cells
-	// DEAD CELLS
-	for (i = 0; i < cells[5].length; i++)
-	{
-		world_location = (cells[5][i].y*world_width + cells[5][i].x)*4;
-		world.data[world_location+0]=0;
-		world.data[world_location+1]=0;
-		world.data[world_location+2]=0;
-	}
+	// If the world was resized while life was in progress
+	if (world_resized) update_resized_world();
 	
-	// GREEN CELLS
-	for (i = 0; i < cells[0].length; i++)
+	// Display current state in the order of visibility of cells
+	// Go through all world locations
+	for (x = 0; x < world_width; x++)
 	{
-		world_location = (cells[0][i].y*world_width + cells[0][i].x)*4;
-		world.data[world_location+0]=0;
-		world.data[world_location+1]=150;
-		world.data[world_location+2]=0;
+		for (y = 0; y < world_height; y++)
+		{
+			found_green = false;
+			found_yellow = false;
+			found_orange = false;
+			found_red = false;
+			found_brown = false;
+			found_dead = false;
+			
+			// Check if the location is defined at all
+			if (world_cells[y][x] == undefined) continue;
+			
+			// Go throguh cells placed in this location and check for cell types
+			for (i = world_cells[y][x].length-1; i >= 0; i--)
+			{
+				if (world_cells[y][x][i].type == 'g') found_green = true;
+				else if (world_cells[y][x][i].type == 'y') found_yellow = true;
+				else if (world_cells[y][x][i].type == 'o') found_orange = true;
+				else if (world_cells[y][x][i].type == 'r') found_red = true;
+				else if (world_cells[y][x][i].type == 'b') found_brown = true;
+				else if (world_cells[y][x][i].type == 'd') found_dead = true;
+			}
+			
+			// Visualize the cells according to priority
+			if (found_red)
+			{
+				world_location = (y*world_width + x)*4;
+				world.data[world_location+0]=150;
+				world.data[world_location+1]=0;
+				world.data[world_location+2]=0;
+			}
+			else if (found_yellow)
+			{
+				world_location = (y*world_width + x)*4;
+				world.data[world_location+0]=200;
+				world.data[world_location+1]=200;
+				world.data[world_location+2]=0;
+			}
+			else if (found_green)
+			{
+				world_location = (y*world_width + x)*4;
+				world.data[world_location+0]=0;
+				world.data[world_location+1]=150;
+				world.data[world_location+2]=0;
+			}
+			else if (found_dead)
+			{
+				world_location = (y*world_width + x)*4;
+				world.data[world_location+0]=0;
+				world.data[world_location+1]=0;
+				world.data[world_location+2]=0;
+			}
+		}
 	}
-	// YELLOW CELLS
-	for (i = 0; i < cells[1].length; i++)
-	{
-		world_location = (cells[1][i].y*world_width + cells[1][i].x)*4;
-		world.data[world_location+0]=200;
-		world.data[world_location+1]=200;
-		world.data[world_location+2]=0;
-	}
-	// ORANGE CELLS
-		// TODO
-		
-	// RED CELLS
-	for (i = 0; i < cells[3].length; i++)
-	{
-		world_location = (cells[3][i].y*world_width + cells[3][i].x)*4;
-		world.data[world_location+0]=150;
-		world.data[world_location+1]=0;
-		world.data[world_location+2]=0;
-	}
-	// BROWN CELLS
-		// TODO
 	
 	// Make cells do something
 	// -----------------------
@@ -204,18 +264,18 @@ function live()
 		else if (world.data[i+2]<255) world.data[i+2]++;
 	}
 	
-	//console.log(cells_counts);
+	// Update the status bar
 	document.getElementById("status_bar").innerHTML = "Stats |" +
-		" Green:"  + cells[0].length.toString() + 
-		" Yellow:" + cells[1].length.toString() + 
-		" Orange:" + cells[2].length.toString() + 
-		" Red:"    + cells[3].length.toString() + 
-		" Brown:"  + cells[4].length.toString() + 
-		" Dead:"   + cells[5].length.toString();
+		" Green:"  + green_count + 
+		" Yellow:" + yellow_count +
+		" Orange:" + 0 +
+		" Red:"    + 0 + 
+		" Brown:"  + 0 +
+		" Dead:"   + dead_count;
 	world_view.putImageData(world,0,0);
 	
 	if (celllife_running)
 	{
-		setTimeout(live, 10);
+		setTimeout(live, celllife_delay);
 	}
 }
