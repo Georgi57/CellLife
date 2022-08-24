@@ -17,6 +17,9 @@ var window_height = window.innerHeight
 // World parameters
 var world_height = 500;
 var world_width = 500;
+var world_resized = false;
+var world_height_resized;
+var world_width_resized;
 var world;
 var world_view;
 var world_cells;
@@ -77,6 +80,58 @@ function reset_world()
 	create_life();
 }
 
+function resize_world()
+{
+	world_height_resized = Number(prompt("Enter HEIGHT of the world", "500"));
+	world_width_resized = Number(prompt("Enter WIDTH of the world", "500"));
+	world_resized = true;
+	
+	// Only update the world if life is not running. Otherwise wait until an end of a cycle
+	if (!celllife_running)
+	{
+		update_resized_world();
+	}
+}
+
+function update_resized_world()
+{
+	// Fill the previous world space with emptiness
+	for (i = 0; i < world_height; i+=1)
+	{
+		for (j = 0; j < world_width; j+=1)
+		{
+			// Old world location
+			old_loc = (i*world_width + j)*4;
+			
+			// Emptiness if out of bounds of teh new world
+			if (i > world_height_resized - 1 || j > world_width_resized - 1)
+			{
+				world.data[old_loc+0]=51;
+				world.data[old_loc+1]=51;
+				world.data[old_loc+2]=51;
+				world.data[old_loc+3]=255;
+			}
+		}
+	}
+	world_view.putImageData(world,0,0);
+
+	// Cut the the world_cells array
+	if (world_height_resized < world_height)
+		world_cells.splice(world_height_resized, world_height - world_height_resized);
+	if (world_width_resized < world_width)
+	{
+		for (var i=0;i<world_height_resized;i++)
+		{
+			world_cells[i].splice(world_width_resized, world_width - world_width_resized);
+		}
+	}
+		
+	// Now adjust the main world size variables
+	world_height = world_height_resized;
+	world_width = world_width_resized;
+	world_resized = false;
+}
+
 function create_new_world()
 {
 	var world_canvas = document.getElementById("world");
@@ -89,13 +144,13 @@ function create_new_world()
 		world.data[i+2]=255; // blue
 		world.data[i+3]=200;
 	}
+	world_view.putImageData(world,0,0);
+	
 	world_cells = new Array(world_height);
 	for (var i=0;i<world_height;i++)
 	{
 		world_cells[i] = new Array(world_width);
 	}
-	world_view.putImageData(world,0,0);
-	console.log("Space for canvas:", world_width, world_height);
 }
 
 function create_life()
@@ -127,8 +182,10 @@ function live()
 	var i;
 	var world_location;
 	
-	// Display current state in the order of visibility of cells
+	// If the world was resized while life was in progress
+	if (world_resized) update_resized_world();
 	
+	// Display current state in the order of visibility of cells
 	// Go through all world locations
 	for (x = 0; x < world_width; x++)
 	{
@@ -207,7 +264,7 @@ function live()
 		else if (world.data[i+2]<255) world.data[i+2]++;
 	}
 	
-	//console.log(cells_counts);
+	// Update the status bar
 	document.getElementById("status_bar").innerHTML = "Stats |" +
 		" Green:"  + green_count + 
 		" Yellow:" + yellow_count +
