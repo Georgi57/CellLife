@@ -95,29 +95,23 @@ function resize_world()
 
 function update_resized_world()
 {
-	// Fill the previous world space with emptiness
-	for (i = 0; i < world_height; i+=1)
+	// Fill the world space with emptiness
+	for (i = 0; i < world_height*world_width*4; i+=4)
 	{
-		for (j = 0; j < world_width; j+=1)
-		{
-			// Old world location
-			old_loc = (i*world_width + j)*4;
-			
-			// Emptiness if out of bounds of teh new world
-			if (i > world_height_resized - 1 || j > world_width_resized - 1)
-			{
-				world.data[old_loc+0]=51;
-				world.data[old_loc+1]=51;
-				world.data[old_loc+2]=51;
-				world.data[old_loc+3]=255;
-			}
-		}
+		world.data[i+0]=51;
+		world.data[i+1]=51;
+		world.data[i+2]=51;
+		world.data[i+3]=255;
 	}
 	world_view.putImageData(world,0,0);
 
-	// Cut the the world_cells array
+	// Adjust the world_cells array according to the new world, keeping contents
 	if (world_height_resized < world_height)
 		world_cells.splice(world_height_resized, world_height - world_height_resized);
+	else
+	{
+		for (var i=0;i<world_height_resized - world_height;i++) world_cells.push(new Array(world_width_resized));
+	}
 	if (world_width_resized < world_width)
 	{
 		for (var i=0;i<world_height_resized;i++)
@@ -125,11 +119,25 @@ function update_resized_world()
 			world_cells[i].splice(world_width_resized, world_width - world_width_resized);
 		}
 	}
-		
+	else
+	{
+		if (world_height_resized > world_height) world_height_adjustment = world_height;
+		else world_height_adjustment = world_height_resized;
+		for (var i=0;i < world_height_adjustment;i++)
+		{
+			for (var j=0;j < world_width_resized - world_width;j++)
+			{
+				world_cells[i].push([]);
+			}
+		}
+	}
+			
 	// Now adjust the main world size variables
 	world_height = world_height_resized;
 	world_width = world_width_resized;
 	world_resized = false;
+	
+	create_new_world();
 }
 
 function create_new_world()
@@ -145,16 +153,16 @@ function create_new_world()
 		world.data[i+3]=200;
 	}
 	world_view.putImageData(world,0,0);
-	
+}
+
+function create_life()
+{
 	world_cells = new Array(world_height);
 	for (var i=0;i<world_height;i++)
 	{
 		world_cells[i] = new Array(world_width);
 	}
-}
-
-function create_life()
-{
+	
 	// Random green cell allocation
 	for (i = 0; i < 100; i++) {
 		
