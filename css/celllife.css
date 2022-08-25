@@ -38,7 +38,6 @@ Started 2018-09-08
   display: none;
   position: absolute;
   background-color: #f1f1f1;
-  min-width: 100px;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
 }
 
@@ -57,20 +56,25 @@ Started 2018-09-08
 
 /* The container <div> - needed to position the dropdown content */
 .dropside {
-  float: left;
+  float: right;
   background-color: #f1f1f1;
-  text-align: center;
-  padding: 0px 10px;
+  text-align: right;
+  padding: 0px 0px;
   text-decoration: none;
   font-size: 17px;
   display: inline-block;
+}
+
+.dropside a{
+  float: right;
+  min-width: 75px;
 }
 
 /* Dropdown Content (Hidden by Default) */
 .dropside-content {
   display: none;
   position: absolute;
-  left: 100px;
+  left: 95px;
   background-color: #f1f1f1;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
 }
