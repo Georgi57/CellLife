@@ -5,15 +5,6 @@ Started 2018-09-08
 
 var celllife_running = false;
 
-// Window properties
-var window_width = window.innerWidth
-	|| document.documentElement.clientWidth
-	|| document.body.clientWidth;
-
-var window_height = window.innerHeight
-	|| document.documentElement.clientHeight
-	|| document.body.clientHeight;
-
 // World parameters
 var world_height = 500;
 var world_width = 500;
@@ -31,7 +22,15 @@ var celllife_created = false;
 
 function load_function()
 {
-	console.log("Space for canvas:",window_width, window_height);
+	// Window properties
+	var window_width = window.innerWidth
+		|| document.documentElement.clientWidth
+		|| document.body.clientWidth;
+
+	var window_height = window.innerHeight
+		|| document.documentElement.clientHeight
+		|| document.body.clientHeight;
+	
 	// Resize the canvas if needed
 	var world_canvas = document.getElementById("world");
 	if (window_width - 4 > world_width){
@@ -80,10 +79,36 @@ function reset_world()
 	create_life();
 }
 
-function resize_world()
+function resize_world_manually()
 {
-	world_height_resized = Number(prompt("Enter HEIGHT of the world", "500"));
-	world_width_resized = Number(prompt("Enter WIDTH of the world", "500"));
+	world_height_resized = Number(prompt("Enter HEIGHT of the world", world_height));
+	if (world_height_resized != 0)
+	{
+		world_width_resized = Number(prompt("Enter WIDTH of the world", world_width));
+		world_resized = true;
+		
+		// Only update the world if life is not running. Otherwise wait until an end of a cycle
+		if (!celllife_running)
+		{
+			update_resized_world();
+		}
+	}
+}
+
+function resize_world_fit_window()
+{
+	// Window properties
+	var window_width = window.innerWidth
+		|| document.documentElement.clientWidth
+		|| document.body.clientWidth;
+
+	var window_height = window.innerHeight
+		|| document.documentElement.clientHeight
+		|| document.body.clientHeight;
+		
+	// Resize the world according to window
+	world_width_resized = window_width - 4;
+	world_height_resized = window_height - 66;
 	world_resized = true;
 	
 	// Only update the world if life is not running. Otherwise wait until an end of a cycle
@@ -138,6 +163,7 @@ function update_resized_world()
 	world_resized = false;
 	
 	create_new_world();
+	console.log("World size:", world_width, world_height);
 }
 
 function create_new_world()
