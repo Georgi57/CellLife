@@ -42,6 +42,9 @@ function load_function()
 		world_canvas.height = world_height
 	}
 	console.log("World size:", world_width, world_height);
+	
+	// Start life
+	button_start_pause();
 }
 
 function button_start_pause()
