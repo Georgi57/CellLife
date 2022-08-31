@@ -309,6 +309,13 @@ function live()
 				world.data[world_location+1]=200;
 				world.data[world_location+2]=0;
 			}
+			else if (found_brown)
+			{
+				world_location = (y*world_width + x)*4;
+				world.data[world_location+0]=139;
+				world.data[world_location+1]=69;
+				world.data[world_location+2]=19;
+			}
 			else if (found_green)
 			{
 				world_location = (y*world_width + x)*4;
@@ -352,7 +359,7 @@ function live()
 		" Yellow:" + yellow_count +
 		" Orange:" + 0 +
 		" Red:"    + 0 + 
-		" Brown:"  + 0 +
+		" Brown:"  + brown_count +
 		" Dead:"   + dead_count;
 	world_view.putImageData(world,0,0);
 	
