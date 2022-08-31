@@ -120,12 +120,15 @@ function resize_world_manually()
 	if (world_height_resized != 0)
 	{
 		world_width_resized = Number(prompt("Enter WIDTH of the world", world_width));
-		world_resized = true;
-		
-		// Only update the world if life is not running. Otherwise wait until an end of a cycle
-		if (!celllife_running)
+		if (world_width_resized != 0)
 		{
-			update_resized_world();
+			world_resized = true;
+			
+			// Only update the world if life is not running. Otherwise wait until an end of a cycle
+			if (!celllife_running)
+			{
+				update_resized_world();
+			}
 		}
 	}
 }
