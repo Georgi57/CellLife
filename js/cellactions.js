@@ -7,6 +7,7 @@ Started 2020-07-29
 var green_count = 0;
 var yellow_count = 0;
 var brown_count = 0;
+var red_count = 0;
 var dead_count = 0;
 
 // Cell behaviour variables
@@ -15,9 +16,13 @@ var green_cell_reproduce_energy = 100;
 
 var yellow_cell_max_energy = 1000;
 var yellow_cell_reproduce_energy = 500;
+var yellow_cell_frustration_energy = 30;
 
 var brown_cell_max_energy = 1000;
 var brown_cell_reproduce_energy = 500;
+var brown_cell_frustration_energy = 30;
+
+var red_cell_reproduce_energy = 500;
 
 function cells_act()
 {
@@ -28,6 +33,7 @@ function cells_act()
 	green_count = 0;
 	yellow_count = 0;
 	brown_count = 0;
+	red_count = 0;
 	dead_count = 0;
 	
 	// Placeholder for checks
@@ -226,6 +232,17 @@ function cells_act()
 							
 							world_cells[y][x].push(new_cell);
 						}
+						else if (world_cells[y][x][i].energy < yellow_cell_frustration_energy)
+						{
+							// Cannibalism chance when frustrated by the lack of food
+							mutate = Math.floor((Math.random() * 1000));
+							
+							if (mutate == 0)
+							{
+								world_cells[y][x][i].type = 'r';
+
+							}
+						}
 						else
 						{
 							
@@ -322,6 +339,17 @@ function cells_act()
 							
 							world_cells[y][x].push(new_cell);
 						}
+						else if (world_cells[y][x][i].energy < brown_cell_frustration_energy)
+						{
+							// Cannibalism chance when frustrated by the lack of food
+							mutate = Math.floor((Math.random() * 1000));
+							
+							if (mutate == 0)
+							{
+								world_cells[y][x][i].type = 'r';
+
+							}
+						}
 						else
 						{
 							
@@ -384,6 +412,102 @@ function cells_act()
 				
 				
 				
+				// RED CELL ACTIONS
+				// 1. Chance for red cell to eat a yellow or brown cell
+				// 2. Chance to reproduce
+				else if (world_cells[y][x][i].type == 'r' && world_cells[y][x][i].last_action !== world_time)
+				{
+					world_cells[y][x][i].last_action = world_time;
+					red_count += 1;
+					
+					// Chance to die
+					var death_chance = Math.floor((Math.random() * (100+world_cells[y][x][i].energy/10)));
+					if (death_chance == 0 || world_cells[y][x][i].energy < 0)
+					{
+						world_cells[y][x][i].type = 'd';
+					}
+					else
+					{
+						// Reproduce if there is enough energy
+						if (world_cells[y][x][i].energy > red_cell_reproduce_energy)
+						{
+							// This cell looses energy on reproduction
+							world_cells[y][x][i].energy -= 300;
+							
+							// Cell parameters
+							new_cell = {
+								number: cell_total_number,
+								type: 'r',
+								energy: 50,
+								birth: world_time,
+								last_action: world_time
+							};
+							cell_total_number += 1;
+							
+							world_cells[y][x].push(new_cell);
+						}
+						else
+						{
+							
+							// Go throguh cells placed in this location to see if the cell can eat
+							red_found_food = false;
+							for (j = world_cells[y][x].length-1; j >= 0; j--)
+							{
+								if (world_cells[y][x][j].type == 'y' || world_cells[y][x][j].type == 'b')
+								{
+									// Chance to eat another cell
+									var eat = Math.floor((Math.random() * 100));
+									if (eat>=0 && eat<=19)
+									{
+										red_found_food = true;
+										world_cells[y][x][i].energy += world_cells[y][x][j].energy;
+										world_cells[y][x].splice(j,1);
+									}
+									break;
+								}
+							}
+							
+							if (!red_found_food)
+							{
+								// Cell loses energy on movement
+								world_cells[y][x][i].energy -= 1;
+								
+								var direction = Math.floor((Math.random() * 4));
+								switch(direction){
+									case 0:
+										new_y = y + 1;
+										if (new_y >= world_height) new_y -= world_height;
+										new_x = x;
+										break;
+									case 1:
+										new_x = x + 1;
+										if (new_x >= world_width) new_x -= world_width;
+										new_y = y;
+										break;
+									case 2:
+										new_y = y - 1;
+										if (new_y < 0) new_y += world_height;
+										new_x = x;
+										break;
+									case 3:
+										new_x = x - 1;
+										if (new_x < 0) new_x += world_width;
+										new_y = y;
+										break;
+								}
+								
+								// Add cell to the new location
+								if (world_cells[new_y][new_x] == undefined) world_cells[new_y][new_x]=[];
+								world_cells[new_y][new_x].push(world_cells[y][x][i]);
+								// Remove cell from the current location
+								world_cells[y][x].splice(i,1);
+							}
+						}
+					}
+				}
+				
+				
+				
 				// DEAD CELL ACTIONS
 				// 1. Disolve over time
 				// 2. If no energy left - remove
@@ -403,77 +527,6 @@ function cells_act()
 			}
 		}
 	}
-	/*
-	// RED CELL ACTIONS
-	// 1. Chance for red cell to eat a yellow cell
-	// 2. Chance to reproduce
-	for (i = 0; i < cells[3].length; i++)
-	{
-		// Chance to die
-		var death_chance = Math.floor((Math.random() * 250));
-		if (death_chance == 0)
-		{
-			cells[1].splice(i,1);
-		}
-		
-		for (n = 0; n < cells[1].length; n++)
-		{
-			if (cells[3][i].x == cells[1][n].x && cells[3][i].y == cells[1][n].y)
-			{
-				// Chance to eat another cell
-				var type = Math.floor((Math.random() * 10));
-				if (type==0 || type==1)
-				{
-					cells[1].splice(n,1);
-					// Smaller chance to reproduce
-					if (type==0)
-					{
-						// Cell parameters
-						var new_cell = {
-							number: cell_total_number, 	// Cell number
-							x: cells[3][i].x,		// location x
-							y: cells[3][i].y,		// location y
-							energy: 10
-						};
-						cell_total_number += 1;
-						cells[3].push(new_cell);
-					}
-				}
-				break;
-			}
-		}
-		
-		move_randomly = 1
-		if (move_randomly){
-			var direction = Math.floor((Math.random() * 4));
-			switch(direction){
-				case 0:
-					cells[3][i].y += 1;
-					if (cells[3][i].y >= world_height) cells[3][i].y -= world_height;
-					break;
-				case 1:
-					cells[3][i].x += 1;
-					if (cells[3][i].x >= world_width) cells[3][i].x -= world_width;
-					break;
-				case 2:
-					cells[3][i].y -= 1;
-					if (cells[3][i].y <= 0) cells[3][i].y += world_height;
-					break;
-				case 3:
-					cells[3][i].x -= 1;
-					if (cells[3][i].x <= 0) cells[3][i].x += world_width;
-					break;
-			}
-		}
-		
-		// Chance to die
-		var death_chance = Math.floor((Math.random() * 250));
-		if (death_chance == 0)
-		{
-			cells[5].push(cells[3][i])
-			cells[3].splice(i,1);
-		}
-	}*/
 }
 
 // Search around the cell
