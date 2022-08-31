@@ -153,6 +153,16 @@ function resize_world_fit_window()
 	}
 }
 
+function change_seed_count()
+{
+	var new_seed_count = Number(prompt("Enter number of green seeds you want the world to start life", seed_count));
+	if (new_seed_count != 0)
+	{
+		seed_count = new_seed_count;
+		console.log("New seed count:", new_seed_count);
+	}
+}
+
 function update_resized_world()
 {
 	// Fill the world space with emptiness
