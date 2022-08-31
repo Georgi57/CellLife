@@ -17,6 +17,7 @@ var world_cells;
 var world_time = 0;
 var celllife_delay = 10;
 var cell_total_number = 0;
+var seed_count = 100;
 
 var celllife_created = false;
 
@@ -80,6 +81,37 @@ function reset_world()
 	// Recreate the world and cells
 	create_new_world();
 	create_life();
+	
+	// Reset the status bar
+	document.getElementById("status_bar").innerHTML = "Stats |" +
+		" Green:"  + green_count + 
+		" Yellow:" + 0 +
+		" Orange:" + 0 +
+		" Red:"    + 0 + 
+		" Brown:"  + 0 +
+		" Dead:"   + 0;
+}
+
+function clear_world()
+{
+	// Recreate the world and cells
+	create_new_world();
+	world_cells = new Array(world_height);
+	for (var i=0;i<world_height;i++)
+	{
+		world_cells[i] = new Array(world_width);
+	}
+	// 
+	celllife_created = true;
+	
+	// Reset the status bar
+	document.getElementById("status_bar").innerHTML = "Stats |" +
+		" Green:"  + 0 + 
+		" Yellow:" + 0 +
+		" Orange:" + 0 +
+		" Red:"    + 0 + 
+		" Brown:"  + 0 +
+		" Dead:"   + 0;
 }
 
 function resize_world_manually()
@@ -193,7 +225,7 @@ function create_life()
 	}
 	
 	// Random green cell allocation
-	for (i = 0; i < 100; i++) {
+	for (i = 0; i < seed_count; i++) {
 		
 		// Cell parameters
 		new_cell = {
