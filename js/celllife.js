@@ -86,7 +86,6 @@ function reset_world()
 	document.getElementById("status_bar").innerHTML = "Stats |" +
 		" Green:"  + green_count + 
 		" Yellow:" + 0 +
-		" Orange:" + 0 +
 		" Red:"    + 0 + 
 		" Brown:"  + 0 +
 		" Dead:"   + 0;
@@ -108,7 +107,6 @@ function clear_world()
 	document.getElementById("status_bar").innerHTML = "Stats |" +
 		" Green:"  + 0 + 
 		" Yellow:" + 0 +
-		" Orange:" + 0 +
 		" Red:"    + 0 + 
 		" Brown:"  + 0 +
 		" Dead:"   + 0;
@@ -275,7 +273,6 @@ function live()
 		{
 			found_green = false;
 			found_yellow = false;
-			found_orange = false;
 			found_red = false;
 			found_brown = false;
 			found_dead = false;
@@ -288,7 +285,6 @@ function live()
 			{
 				if (world_cells[y][x][i].type == 'g') found_green = true;
 				else if (world_cells[y][x][i].type == 'y') found_yellow = true;
-				else if (world_cells[y][x][i].type == 'o') found_orange = true;
 				else if (world_cells[y][x][i].type == 'r') found_red = true;
 				else if (world_cells[y][x][i].type == 'b') found_brown = true;
 				else if (world_cells[y][x][i].type == 'd') found_dead = true;
@@ -357,7 +353,6 @@ function live()
 	document.getElementById("status_bar").innerHTML = "Stats |" +
 		" Green:"  + green_count + 
 		" Yellow:" + yellow_count +
-		" Orange:" + 0 +
 		" Red:"    + red_count + 
 		" Brown:"  + brown_count +
 		" Dead:"   + dead_count;
