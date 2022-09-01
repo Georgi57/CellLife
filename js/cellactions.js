@@ -54,14 +54,39 @@ function cells_act()
 			for (i = world_cells[y][x].length-1; i >= 0; i--)
 			{
 				// GREEN CELL ACTIONS
-				// 1. Grow by increasing energy
-				// 2. Reproduce if the cell accumulated enough energy
-				// 2.1. If there is space around reproduce as green
-				// 2.2. If there is not enough space around give a chance to mutate to yellow
-				// 3. There is a chance to die
+				// 1. The is a chance to die
+				// 2. Grow by increasing energy
+				// 3. Reproduce if the cell accumulated enough energy
+				// 3.1. If there is space around reproduce as green
+				// 3.2. If there is not enough space around give a chance to mutate to yellow or brown
 				if (world_cells[y][x][i].type == 'g')
 				{
 					green_count += 1;
+					
+					// Chance to die
+					let death_chance = Math.floor((Math.random() * 150));
+					if (death_chance == 0)
+					{
+						// Check if there is a dead cell already
+						let dead_cell_at_this_location_exists = false;
+						for (let j = 0; j < world_cells[y][x].length; j++)
+						{
+							if (world_cells[y][x][j].type == 'd')
+							{
+								dead_cell_at_this_location_exists = true;
+								world_cells[y][x][j].energy += world_cells[y][x][i].energy;
+								world_cells[y][x].splice(i,1);
+								break;
+							}
+						}
+						// In case there is not dead cell, the green cell turns dead
+						if (!dead_cell_at_this_location_exists)
+						{
+							world_cells[y][x][i].type = 'd';
+						}
+						else continue;
+						
+					}
 					
 					// Increase energy
 					if (world_cells[y][x][i].energy < green_cell_max_energy)
@@ -189,13 +214,6 @@ function cells_act()
 							}
 						}
 						
-					}
-					
-					// Chance to die
-					var death_chance = Math.floor((Math.random() * 150));
-					if (death_chance == 0)
-					{
-						world_cells[y][x][i].type = 'd';
 					}
 				}
 				
