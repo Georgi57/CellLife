@@ -128,7 +128,7 @@ function cells_act()
 							if (world_cells[new_y][new_x] == undefined) world_cells[new_y][new_x]=[];
 							for (n = 0; n < world_cells[new_y][new_x].length; n++)
 							{
-								if (world_cells[y][new_x][n].type == 'g')
+								if (world_cells[new_y][new_x][n].type == 'g')
 								{
 									space_found = false;
 									break;
