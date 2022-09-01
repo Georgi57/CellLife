@@ -42,9 +42,6 @@ function create_test_cells()
 // Function to look for anything out of place
 function check_world_cells_for_issues()
 {
-	// Need a full list of cells in one place for this
-	cells = [];
-	
 	for (x = 0; x < world_width; x++)
 	{
 		for (y = 0; y < world_height; y++)
@@ -53,26 +50,30 @@ function check_world_cells_for_issues()
 			if (world_cells[y][x] == undefined) continue;
 			
 			number_of_green_cells_in_this_location = 0;
+			number_of_black_cells_in_this_location = 0;
 			
 			// Go throguh cells placed in this location
 			for (i = world_cells[y][x].length-1; i >= 0; i--)
 			{
-				// Save the important properties
-				cells.push([world_cells[y][x][i].number, world_cells[y][x][i].type]);
-				
-				
 				// Check for multiple green cells in one location
 				if (world_cells[y][x][i].type == 'g')
 				{
 					number_of_green_cells_in_this_location += 1;
 					if (number_of_green_cells_in_this_location > 1)
 					{
-						console.log("More than one cells at", x, y, number_of_green_cells_in_this_location);
+						console.log("More than one green cells at", x, y, number_of_green_cells_in_this_location);
 					}
 				}
 				
-				// Check of cell duplicates according to cell number
-				//cells.forEach()
+				// Check for multiple green cells in one location
+				if (world_cells[y][x][i].type == 'd')
+				{
+					number_of_black_cells_in_this_location += 1;
+					if (number_of_black_cells_in_this_location > 1)
+					{
+						console.log("More than one black cells at", x, y, number_of_black_cells_in_this_location);
+					}
+				}
 			}
 		}
 	}

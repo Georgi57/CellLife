@@ -333,7 +333,7 @@ function live()
 	// -----------------------
 	
 	cells_act();
-	
+	check_world_cells_for_issues();
 	// -----------------------
 	
 	// Fade the traces of cells
