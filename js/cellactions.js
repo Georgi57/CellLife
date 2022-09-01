@@ -24,6 +24,9 @@ var brown_cell_frustration_energy = 30;
 
 var red_cell_reproduce_energy = 500;
 
+var dead_cell_degrade_time = 10;
+// There is not limit to energy stored in the dead
+
 function cells_act()
 {
 	// One cycle increases world time
@@ -509,14 +512,18 @@ function cells_act()
 				
 				
 				// DEAD CELL ACTIONS
-				// 1. Disolve over time
+				// 1. Degrade over time
 				// 2. If no energy left - remove
 				else if (world_cells[y][x][i].type == 'd')
 				{
 					dead_count += 1;
 					
-					// Decrease Cell energy
-					//world_cells[y][x][i].energy -= 1;
+					// Decrease cell energy over longer time than green cells grow
+					if (world_time - world_cells[y][x][i].last_action > dead_cell_degrade_time)
+					{
+						world_cells[y][x][i].energy -= 1;
+						world_cells[y][x][i].last_action = world_time;
+					}
 					
 					// If no energy left, remove the cell
 					if (world_cells[y][x][i].energy <= 0)
