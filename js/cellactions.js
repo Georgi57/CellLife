@@ -24,7 +24,8 @@ var brown_cell_max_energy = 1000;
 var brown_cell_reproduce_energy = 500;
 var brown_cell_frustration_energy = 30;
 
-var red_cell_reproduce_energy = 500;
+var red_cell_reproduce_energy = 2000;
+var red_cell_frustration_energy = 100;
 
 var dead_cell_degrade_time = 3;
 // There is not limit to energy stored in the dead
@@ -162,41 +163,10 @@ function cells_act()
 							world_cells[new_y][new_x].push(new_cell);
 						}
 						// Chance to mutate
-						else
+						else if (world_cells[y][x][i].energy > green_cell_frustration_energy)
 						{
-							// One in a million
-							mutate = Math.floor((Math.random() * 1000000));
-							
-							if (mutate == 0)
-							{
-								// One in a million to become yellow
-								new_y_cell = {
-									number: cell_total_number, 	// Cell number
-									type: 'y',				// type of cell
-									energy: 40,
-									birth: world_time,
-									last_action: world_time
-								};
-								cell_total_number += 1;
-								
-								world_cells[y][x].push(new_y_cell);
-							}
-							else if (mutate == 1)
-							{
-								// One in a million to become brown
-								new_y_cell = {
-									number: cell_total_number, 	// Cell number
-									type: 'b',				// type of cell
-									energy: 40,
-									birth: world_time,
-									last_action: world_time
-								};
-								cell_total_number += 1;
-								
-								world_cells[y][x].push(new_y_cell);
-							}
+							cell_mutation_chance(y, x, i, true, 1000000);
 						}
-						
 					}
 				}
 				
@@ -216,6 +186,12 @@ function cells_act()
 					if (cell_turned_dead[0] && !cell_turned_dead[1]) i -= 1;
 					if (cell_turned_dead[0]) continue;
 
+					// Chance to mutate when frustrated by the lack of food
+					if (world_cells[y][x][i].energy < yellow_cell_frustration_energy)
+					{
+						cell_mutation_chance(y, x, i, false, 1000);
+					}
+					
 					// Reproduce if there is enough energy
 					if (world_cells[y][x][i].energy > yellow_cell_reproduce_energy)
 					{
@@ -233,17 +209,6 @@ function cells_act()
 						cell_total_number += 1;
 						
 						world_cells[y][x].push(new_cell);
-					}
-					else if (world_cells[y][x][i].energy < yellow_cell_frustration_energy)
-					{
-						// Cannibalism chance when frustrated by the lack of food
-						mutate = Math.floor((Math.random() * 1000));
-						
-						if (mutate == 0)
-						{
-							world_cells[y][x][i].type = 'r';
-
-						}
 					}
 					else
 					{
@@ -320,6 +285,12 @@ function cells_act()
 					if (cell_turned_dead[0] && !cell_turned_dead[1]) i -= 1;
 					if (cell_turned_dead[0]) continue;
 					
+					// Chance to mutate when frustrated by the lack of food
+					if (world_cells[y][x][i].energy < brown_cell_frustration_energy)
+					{
+						cell_mutation_chance(y, x, i, false, 1000);
+					}
+					
 					// Reproduce if there is enough energy
 					if (world_cells[y][x][i].energy > brown_cell_reproduce_energy)
 					{
@@ -337,17 +308,6 @@ function cells_act()
 						cell_total_number += 1;
 						
 						world_cells[y][x].push(new_cell);
-					}
-					else if (world_cells[y][x][i].energy < brown_cell_frustration_energy)
-					{
-						// Cannibalism chance when frustrated by the lack of food
-						mutate = Math.floor((Math.random() * 1000));
-						
-						if (mutate == 0)
-						{
-							world_cells[y][x][i].type = 'r';
-
-						}
 					}
 					else
 					{
@@ -423,6 +383,12 @@ function cells_act()
 					// If cell died and energy transferred to an existing cell - move index
 					if (cell_turned_dead[0] && !cell_turned_dead[1]) i -= 1;
 					if (cell_turned_dead[0]) continue;
+					
+					// Chance to mutate when frustrated by the lack of food
+					if (world_cells[y][x][i].energy < red_cell_frustration_energy)
+					{
+						cell_mutation_chance(y, x, i, false, 1000);
+					}
 					
 					// Reproduce if there is enough energy
 					if (world_cells[y][x][i].energy > red_cell_reproduce_energy)
@@ -600,4 +566,67 @@ function cell_death_chance(y, x, i, chance)
 		}
 	}
 	return [false, false];
+}
+
+
+
+// Chance to mutate from frustration
+// One in a million chance of mutation
+function cell_mutation_chance(y, x, i, create_new_cell, chance)
+{
+	// Check for mutation options - possible food around
+	food_for_yellow = false;
+	food_for_brown = false;
+	food_for_red = false;
+	for (let j = 0; j < world_cells[y][x].length; j++)
+	{
+		if 		(world_cells[y][x][j].type == 'g') food_for_yellow = true;
+		else if (world_cells[y][x][j].type == 'y') food_for_red = true;
+		else if (world_cells[y][x][j].type == 'b') food_for_red = true;
+		else if (world_cells[y][x][j].type == 'r') food_for_red = true;
+		else if (world_cells[y][x][j].type == 'd') food_for_brown = true;
+	}
+	
+	// Only mutate if there is something around to eat
+	if (food_for_yellow || food_for_brown || food_for_red)
+	{
+		// One in a million
+		let mutate = Math.floor((Math.random() * chance));
+		
+		new_mutated_cell = {
+				number: cell_total_number,
+				type: 'n',
+				energy: 0,
+				birth: world_time,
+				last_action: world_time
+		};
+		
+		if (mutate == 0 && food_for_yellow)
+		{
+			new_mutated_cell.type = 'y';
+		}
+		else if (mutate == 1 && food_for_brown)
+		{
+			new_mutated_cell.type = 'b';
+		}
+		else if (mutate == 2 && food_for_red)
+		{
+			new_mutated_cell.type = 'r';
+		}
+		else return;
+		
+		// Create new cell
+		if (create_new_cell)
+		{
+			world_cells[y][x][i].energy = Math.floor(world_cells[y][x][i].energy/3);
+			new_mutated_cell.energy = world_cells[y][x][i].energy;
+			cell_total_number += 1;
+			world_cells[y][x].push(new_mutated_cell);
+		}
+		// Existing cell mutates to eat different food
+		else
+		{
+			world_cells[y][x][i].type = new_mutated_cell.type;
+		}
+	}
 }

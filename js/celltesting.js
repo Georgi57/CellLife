@@ -74,6 +74,12 @@ function check_world_cells_for_issues()
 						console.log("More than one black cells at", x, y, number_of_black_cells_in_this_location);
 					}
 				}
+				
+				// Check for multiple green cells in one location
+				if (world_cells[y][x][i].type == 'n')
+				{
+					console.log("Mutation gone wrong! Type cell: 'n'");
+				}
 			}
 		}
 	}
