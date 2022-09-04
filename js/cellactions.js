@@ -11,8 +11,10 @@ var red_count = 0;
 var dead_count = 0;
 
 // Cell behaviour variables
+var green_cell_chance_die_base = 300;
 var green_cell_max_energy = 200;
 var green_cell_reproduce_energy = 100;
+var green_cell_frustration_energy = 190;
 
 var yellow_cell_max_energy = 1000;
 var yellow_cell_reproduce_energy = 500;
@@ -24,7 +26,7 @@ var brown_cell_frustration_energy = 30;
 
 var red_cell_reproduce_energy = 500;
 
-var dead_cell_degrade_time = 10;
+var dead_cell_degrade_time = 3;
 // There is not limit to energy stored in the dead
 
 function cells_act()
@@ -64,7 +66,7 @@ function cells_act()
 					green_count += 1;
 					
 					// Chance to die
-					let cell_turned_dead = cell_death_chance(y, x, i, 150);
+					let cell_turned_dead = cell_death_chance(y, x, i, green_cell_chance_die_base);
 					// If cell died and energy transferred to an existing cell - move index
 					if (cell_turned_dead[0] && !cell_turned_dead[1]) i -= 1;
 					if (cell_turned_dead[0]) continue;
@@ -145,13 +147,13 @@ function cells_act()
 						if (space_found)
 						{
 							// This cell looses energy on reproduction
-							world_cells[y][x][i].energy -= 60;
+							world_cells[y][x][i].energy = Math.floor(world_cells[y][x][i].energy/3);
 							
 							// Cell parameters
 							new_cell = {
 								number: cell_total_number, 	// Cell number
 								type: 'g',					// Type of cell
-								energy: 40,
+								energy: world_cells[y][x][i].energy,
 								birth: world_time,
 								last_action: world_time
 							};
