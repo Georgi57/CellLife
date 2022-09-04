@@ -82,70 +82,9 @@ function cells_act()
 					if (world_cells[y][x][i].energy > green_cell_reproduce_energy)
 					{
 						// Search around for space without green cells
-						// Tries in all directions
-						space_found = true;
-						new_x = x+1;
-						if (new_x > world_width-1) new_x = 0;
-						new_y = y;
-						if (world_cells[new_y][new_x] == undefined) world_cells[new_y][new_x]=[];
-						for (n = 0; n < world_cells[new_y][new_x].length; n++)
-						{
-							if (world_cells[new_y][new_x][n].type == 'g')
-							{
-								space_found = false;
-								break;
-							}
-						}
-						if (!space_found)
-						{
-							space_found = true;
-							new_x = x;
-							new_y = y+1;
-							if (new_y > world_height-1) new_y = 0;
-							if (world_cells[new_y][new_x] == undefined) world_cells[new_y][new_x]=[];
-							for (n = 0; n < world_cells[new_y][new_x].length; n++)
-							{
-								if (world_cells[new_y][new_x][n].type == 'g')
-								{
-									space_found = false;
-									break;
-								}
-							}
-						}
-						if (!space_found)
-						{
-							space_found = true;
-							new_x = x-1;
-							if (new_x < 0) new_x = world_width-1;
-							new_y = y;
-							if (world_cells[new_y][new_x] == undefined) world_cells[new_y][new_x]=[];
-							for (n = 0; n < world_cells[new_y][new_x].length; n++)
-							{
-								if (world_cells[new_y][new_x][n].type == 'g')
-								{
-									space_found = false;
-									break;
-								}
-							}
-						}
-						if (!space_found)
-						{
-							space_found = true;
-							new_x = x;
-							new_y = y-1;
-							if (new_y < 0) new_y = world_height-1;
-							if (world_cells[new_y][new_x] == undefined) world_cells[new_y][new_x]=[];
-							for (n = 0; n < world_cells[new_y][new_x].length; n++)
-							{
-								if (world_cells[new_y][new_x][n].type == 'g')
-								{
-									space_found = false;
-									break;
-								}
-							}
-						}
+						new_cell_location = find_close_by(y, x, 'g', false);
 						
-						if (space_found)
+						if (new_cell_location.length !== 0)
 						{
 							// This cell looses energy on reproduction
 							world_cells[y][x][i].energy = Math.floor(world_cells[y][x][i].energy/3);
@@ -160,7 +99,7 @@ function cells_act()
 							};
 							cell_total_number += 1;
 							
-							world_cells[new_y][new_x].push(new_cell);
+							world_cells[new_cell_location[0]][new_cell_location[1]].push(new_cell);
 						}
 						// Chance to mutate
 						else if (world_cells[y][x][i].energy > green_cell_frustration_energy)
@@ -494,46 +433,87 @@ function cells_act()
 	}
 }
 
-// Search around the cell
-function search_around(this_cell, x, y, searched_type, distance){
-	var result = new Array(4);
-	result[0]=x;
-	result[1]=y;
-	result[2]=distance;	// distance
-	result[3]=0;		// success
+
+
+// Search close by
+function find_close_by(y, x, searched_type, present){
+	random_direction = Math.floor((Math.random() * 4));
 	
-	// Check the current spot
-	for (n = 0; n < world_cells[y][x].length; n++)
+	for (i=0; i<4;i++)
 	{
-		if (world_cells[y][x][i].number !== world_cells[y][x][n].number &&
-			searched_type == world_cells[y][x][n].type)
+		direction = i + random_direction;
+		if (direction >= 4) direction - 4;
+		cell_type_present = false;
+		switch (direction)
 		{
-			// found
-			result[3]=1; 
-			return result;
+			case 0:
+			// EAST
+			new_x = x+1;
+			if (new_x > world_width-1) new_x = 0;
+			new_y = y;
+			
+			if (world_cells[new_y][new_x] == undefined) world_cells[new_y][new_x]=[];
+			for (n = 0; n < world_cells[new_y][new_x].length; n++)
+			{
+				if (world_cells[new_y][new_x][n].type == searched_type)
+				{
+					if (present) return [new_y, new_x];
+					else cell_type_present = true;
+				}
+			}
+			if (!cell_type_present) return [new_y, new_x];
+			break;
+			case 1:
+			// SOUTH
+			new_x = x;
+			new_y = y+1;
+			if (new_y > world_height-1) new_y = 0;
+			if (world_cells[new_y][new_x] == undefined) world_cells[new_y][new_x]=[];
+			for (n = 0; n < world_cells[new_y][new_x].length; n++)
+			{
+				if (world_cells[new_y][new_x][n].type == searched_type)
+				{
+					if (present) return [new_y, new_x];
+					else cell_type_present = true;
+				}
+			}
+			if (!cell_type_present) return [new_y, new_x];
+			break;
+			case 2:
+			// WEST
+			new_x = x-1;
+			if (new_x < 0) new_x = world_width-1;
+			new_y = y;
+			if (world_cells[new_y][new_x] == undefined) world_cells[new_y][new_x]=[];
+			for (n = 0; n < world_cells[new_y][new_x].length; n++)
+			{
+				if (world_cells[new_y][new_x][n].type == searched_type)
+				{
+					if (present) return [new_y, new_x];
+					else cell_type_present = true;
+				}
+			}
+			if (!cell_type_present) return [new_y, new_x];
+			break;
+			default:
+			// NORTH
+			new_x = x;
+			new_y = y-1;
+			if (new_y < 0) new_y = world_height-1;
+			if (world_cells[new_y][new_x] == undefined) world_cells[new_y][new_x]=[];
+			for (n = 0; n < world_cells[new_y][new_x].length; n++)
+			{
+				if (world_cells[new_y][new_x][n].type == searched_type)
+				{
+					if (present) return [new_y, new_x];
+					else cell_type_present = true;
+				}
+			}
+			if (!cell_type_present) return [new_y, new_x];
 		}
+		
 	}
-	
-	// Consider the positions around recursively
-	for (i = distance-1; i > 0; i++){
-		result = search_around(world_cells[y][x][i], x+1, y, searched_type, i);
-		if (result[3] == 1){
-			return result;
-		}
-		result = search_around(world_cells[y][x][i], x, y+1, searched_type, i);
-		if (result[3] == 1){
-			return result;
-		}
-		result = search_around(world_cells[y][x][i], x-1, y, searched_type, i);
-		if (result[3] == 1){
-			return result;
-		}
-		result = search_around(world_cells[y][x][i], x, y-1, searched_type, i);
-		if (result[3] == 1){
-			return result;
-		}
-	}
-	return result;
+	return [];
 }
 
 
