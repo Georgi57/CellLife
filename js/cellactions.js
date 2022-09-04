@@ -84,7 +84,7 @@ function cells_act()
 						// Search around for space without green cells
 						new_cell_location = find_close_by(y, x, 'g', false);
 						
-						if (new_cell_location.length !== 0)
+						if (new_cell_location[2]) // location found
 						{
 							// This cell looses energy on reproduction
 							world_cells[y][x][i].energy = Math.floor(world_cells[y][x][i].energy/3);
@@ -175,33 +175,12 @@ function cells_act()
 							// Cell loses energy on movement
 							world_cells[y][x][i].energy -= 1;
 							
-							var direction = Math.floor((Math.random() * 4));
-							switch(direction){
-								case 0:
-									new_y = y + 1;
-									if (new_y >= world_height) new_y -= world_height;
-									new_x = x;
-									break;
-								case 1:
-									new_x = x + 1;
-									if (new_x >= world_width) new_x -= world_width;
-									new_y = y;
-									break;
-								case 2:
-									new_y = y - 1;
-									if (new_y < 0) new_y += world_height;
-									new_x = x;
-									break;
-								case 3:
-									new_x = x - 1;
-									if (new_x < 0) new_x += world_width;
-									new_y = y;
-									break;
-							}
+							// Search around for green cells
+							new_cell_location = find_close_by(y, x, 'g', true);
 							
 							// Add cell to the new location
-							if (world_cells[new_y][new_x] == undefined) world_cells[new_y][new_x]=[];
-							world_cells[new_y][new_x].push(world_cells[y][x][i]);
+							if (world_cells[new_cell_location[0]][new_cell_location[1]] == undefined) world_cells[new_cell_location[0]][new_cell_location[1]]=[];
+							world_cells[new_cell_location[0]][new_cell_location[1]].push(world_cells[y][x][i]);
 							// Remove cell from the current location
 							world_cells[y][x].splice(i,1);
 						}
@@ -442,7 +421,7 @@ function find_close_by(y, x, searched_type, present){
 	for (i=0; i<4;i++)
 	{
 		direction = i + random_direction;
-		if (direction >= 4) direction - 4;
+		if (direction >= 4) direction = direction - 4;
 		cell_type_present = false;
 		switch (direction)
 		{
@@ -457,11 +436,11 @@ function find_close_by(y, x, searched_type, present){
 			{
 				if (world_cells[new_y][new_x][n].type == searched_type)
 				{
-					if (present) return [new_y, new_x];
+					if (present) return [new_y, new_x, true];
 					else cell_type_present = true;
 				}
 			}
-			if (!cell_type_present) return [new_y, new_x];
+			if (!cell_type_present && !present) return [new_y, new_x, true];
 			break;
 			case 1:
 			// SOUTH
@@ -473,11 +452,11 @@ function find_close_by(y, x, searched_type, present){
 			{
 				if (world_cells[new_y][new_x][n].type == searched_type)
 				{
-					if (present) return [new_y, new_x];
+					if (present) return [new_y, new_x, true];
 					else cell_type_present = true;
 				}
 			}
-			if (!cell_type_present) return [new_y, new_x];
+			if (!cell_type_present && !present) return [new_y, new_x, true];
 			break;
 			case 2:
 			// WEST
@@ -489,11 +468,11 @@ function find_close_by(y, x, searched_type, present){
 			{
 				if (world_cells[new_y][new_x][n].type == searched_type)
 				{
-					if (present) return [new_y, new_x];
+					if (present) return [new_y, new_x, true];
 					else cell_type_present = true;
 				}
 			}
-			if (!cell_type_present) return [new_y, new_x];
+			if (!cell_type_present && !present) return [new_y, new_x, true];
 			break;
 			default:
 			// NORTH
@@ -505,15 +484,15 @@ function find_close_by(y, x, searched_type, present){
 			{
 				if (world_cells[new_y][new_x][n].type == searched_type)
 				{
-					if (present) return [new_y, new_x];
+					if (present) return [new_y, new_x, true];
 					else cell_type_present = true;
 				}
 			}
-			if (!cell_type_present) return [new_y, new_x];
+			if (!cell_type_present && !present) return [new_y, new_x, true];
 		}
 		
 	}
-	return [];
+	return [new_y, new_x, false];
 }
 
 
